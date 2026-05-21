@@ -1,24 +1,33 @@
 package controlador;
 
-import mundo.Jugador;
+import modelo.Direction;
+import modelo.Jugador;
 import mundo.Habitacion;
 import mundo.Objeto;
 import mundo.Posicion;
 import java.util.List;
 
 public interface GameControllerModel {
+
+    // Información general
     Habitacion getCurrentRoom();
     Jugador getPlayer();
-    List<Objeto> getInventory();   // o usa tu MyList si prefieres
-    boolean movePlayer(String direccion); // "ARRIBA", "ABAJO", "IZQUIERDA", "DERECHA"
+    List<Objeto> getInventory();          // o MyList si prefieres
+    List<String> getEventLog();
+    boolean isGameOver();
+
+    // Acciones del jugador
+    boolean movePlayer(Direction dir);     // ahora usa enum
     boolean attack(Posicion pos);
     boolean pickItem(Posicion pos);
     boolean useItem(Objeto item);
+
+    // Persistencia
     void saveGame(String file);
     void loadGame(String file);
-    List<String> getEventLog();
-    boolean isGameOver();
+
+    // Métodos específicos para la vista (matriz de la habitación)
     int getCurrentRoomRows();
     int getCurrentRoomCols();
-    String getCellType(int row, int col);   // devuelve "J", "E", "O", "P", "V" (vacío), etc.
+    String getCellSymbol(int row, int col);  // devuelve "J", "E", "O", "P", "·", etc.
 }

@@ -1,4 +1,4 @@
-package mundo;
+package modelo;
 
 public class Jugador {
     private String nombre;
@@ -12,7 +12,6 @@ public class Jugador {
         this.velocidad = velocidad;
     }
 
-    // Getters (los que necesite la vista)
     public String getNombre() { return nombre; }
     public int getVida() { return vida; }
     public int getAtaque() { return ataque; }

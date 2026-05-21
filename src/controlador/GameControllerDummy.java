@@ -82,4 +82,28 @@ public class GameControllerDummy implements GameControllerModel {
     public boolean isGameOver() {
         return false;
     }
+    private int filas = 5;
+    private int columnas = 5;
+    private String[][] mapaDummy = {
+            {"·", "·", "·", "·", "·"},
+            {"·", "J", "·", "E", "·"},
+            {"·", "·", "O", "·", "·"},
+            {"·", "E", "·", "P", "·"},
+            {"·", "·", "·", "·", "·"}
+    };
+
+    @Override
+    public int getCurrentRoomRows() { return filas; }
+
+    @Override
+    public int getCurrentRoomCols() { return columnas; }
+
+    @Override
+    public String getCellType(int row, int col) {
+        return "";
+    }
+
+    public String getCellSymbol(int row, int col) {
+        return mapaDummy[row][col];
+    }
 }

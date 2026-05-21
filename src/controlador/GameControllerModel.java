@@ -18,4 +18,7 @@ public interface GameControllerModel {
     void loadGame(String file);
     List<String> getEventLog();
     boolean isGameOver();
+    int getCurrentRoomRows();
+    int getCurrentRoomCols();
+    String getCellType(int row, int col);   // devuelve "J", "E", "O", "P", "V" (vacío), etc.
 }

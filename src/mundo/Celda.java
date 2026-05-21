@@ -1,4 +1,4 @@
-package modelo;
+package mundo;
 
 /**
  * Representa una celda dentro de la matriz de una habitacion

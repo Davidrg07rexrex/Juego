@@ -1,4 +1,4 @@
-package modelo;
+package mundo;
 
 /**
  * Clase base abstracta para cualquier entidad con stats

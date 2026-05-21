@@ -1,4 +1,4 @@
-package modelo;
+package mundo;
 
 import listas.ListaSimplementeEnlazada;
 

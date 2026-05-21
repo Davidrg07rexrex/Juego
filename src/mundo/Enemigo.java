@@ -1,4 +1,4 @@
-package modelo;
+package mundo;
 
 /**
  * Representa un enemigo del juego

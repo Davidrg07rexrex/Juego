@@ -1,20 +1,21 @@
 package modelo;
 
-public class Jugador extends Entidad{
-    private String nombre;
-    private int vida, ataque, defensa, velocidad;
+import listas.ListaSimplementeEnlazada;
+import mundo.Objeto;
+
+public class Jugador extends Entidad {
+    private ListaSimplementeEnlazada<Objeto> inventario;
 
     public Jugador(String nombre, int vida, int ataque, int defensa, Posicion posicion) {
-        this.nombre = nombre;
-        this.vida = vida;
-        this.ataque = ataque;
-        this.defensa = defensa;
-        this.velocidad = velocidad;
+        super(nombre, vida, ataque, defensa, posicion);
+        this.inventario = new ListaSimplementeEnlazada<>();
     }
 
-    public String getNombre() { return nombre; }
-    public int getVida() { return vida; }
-    public int getAtaque() { return ataque; }
-    public int getDefensa() { return defensa; }
-    public int getVelocidad() { return velocidad; }
+    public ListaSimplementeEnlazada<Objeto> getInventario() {
+        return inventario;
+    }
+
+    // Aquí puedes añadir métodos adicionales como:
+    // public void agregarAlInventario(Objeto o) { ... }
+    // public void usarItem(Objeto o) { ... }
 }

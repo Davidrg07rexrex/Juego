@@ -1,0 +1,164 @@
+package logica;
+
+import controlador.GameControllerModel;
+import modelo.*;
+import listas.*;
+import modelo.Posicion;
+import mundo.*;
+
+public class JuegoReal implements GameControllerModel {
+
+    private TurnoManager turnoManager;
+    private HabitacionModelo habitacionActual;   // la implementación real de Persona 2
+    private Jugador jugador;
+    private ListaSimplementeEnlazada<String> log;
+    private boolean gameOver;
+
+    public JuegoReal(Jugador jugador, HabitacionModelo inicial) {
+        this.jugador = jugador;
+        this.habitacionActual = inicial;
+        this.log = new ListaSimplementeEnlazada<>();
+        this.gameOver = false;
+        // turnoManager se inicializará cuando Persona 2 entregue la lista de enemigos
+    }
+
+    // ---------- Métodos de GameControllerModel ----------
+    @Override
+    public HabitacionModelo getCurrentRoom() {
+        return habitacionActual;
+    }
+
+    @Override
+    public Jugador getPlayer() {
+        return jugador;
+    }
+
+    @Override
+    public ListaSimplementeEnlazada<Objeto> getInventory() {
+        // Suponiendo que Jugador tenga un inventario con tu lista enlazada
+        return jugador.getInventario(); // deberás añadir este método a Jugador
+    }
+
+    @Override
+    public ListaSimplementeEnlazada<String> getEventLog() {
+        return log;
+    }
+
+    @Override
+    public boolean isGameOver() {
+        return gameOver;
+    }
+
+    @Override
+    public boolean movePlayer(Direction dir) {
+        if (gameOver || turnoManager == null) return false;
+        if (turnoManager.getEntidadActual() != jugador) return false;
+
+        Posicion nueva = jugador.getPosicion().mover(dir);
+        if (nueva.getFila() >= 0 && nueva.getFila() < getCurrentRoomRows()
+                && nueva.getColumna() >= 0 && nueva.getColumna() < getCurrentRoomCols()
+                && habitacionActual.esTransitable(nueva.getFila(), nueva.getColumna())) {
+
+            jugador.setPosicion(nueva);
+            log.add("Movido a " + nueva);
+            return true;
+        }
+        log.add("Movimiento inválido hacia " + dir);
+        return false;
+    }
+
+    @Override
+    public boolean attack(Posicion pos) {
+        // TODO: validar adyacencia, obtener enemigo en esa posición,
+        // ejecutar fórmula de combate, actualizar vida, eliminar si muere.
+        log.add("Ataque en " + pos + " (no implementado aún)");
+        return false;
+    }
+
+    @Override
+    public boolean pickItem(Posicion pos) {
+        // TODO: comprobar si en la celda hay un objeto, añadirlo al inventario, quitarlo de la habitación.
+        log.add("Recoger en " + pos + " (no implementado aún)");
+        return false;
+    }
+
+    @Override
+    public boolean useItem(Objeto item) {
+        // TODO: aplicar efecto del objeto, eliminarlo del inventario.
+        log.add("Usar objeto " + item.getNombre() + " (no implementado aún)");
+        return false;
+    }
+
+    @Override
+    public void saveGame(String file) {
+        // Delegar en Persona 2 (PersistenciaJSON)
+        log.add("Guardar partida en " + file + " (pendiente)");
+    }
+
+    @Override
+    public void loadGame(String file) {
+        // Delegar en Persona 2
+        log.add("Cargar partida desde " + file + " (pendiente)");
+    }
+
+    @Override
+    public int getCurrentRoomRows() {
+        return habitacionActual.getFilas();
+    }
+
+    @Override
+    public int getCurrentRoomCols() {
+        return habitacionActual.getColumnas();
+    }
+
+    @Override
+    public String getCellSymbol(int row, int col) {
+        // Prioridad: jugador > enemigo > objeto > puerta > vacío
+        Posicion pJugador = jugador.getPosicion();
+        if (pJugador.getFila() == row && pJugador.getColumna() == col) {
+            return "J";
+        }
+        // El resto de la consulta se delega en Habitacion (Persona 2)
+        return habitacionActual.getSimbolo(row, col); // Persona 2 debe crear este método
+    }
+
+    // ---------- Métodos internos ----------
+    public void iniciarNuevoTurno() {
+        if (turnoManager == null || gameOver) return;
+        turnoManager.iniciarTurno();
+        Entidad actual = turnoManager.getEntidadActual();
+
+        if (actual == null) {
+            gameOver = true;
+            log.add("No quedan entidades. Fin del juego.");
+            return;
+        }
+
+        if (!(actual instanceof Jugador)) {
+            // Si es un enemigo, ejecutar su IA inmediatamente
+            ejecutarTurnoIA();
+        }
+        // Si es el jugador, esperará acciones del usuario a través de la UI.
+    }
+
+    public void ejecutarTurnoIA() {
+        if (turnoManager == null || gameOver) return;
+        Entidad actual = turnoManager.getEntidadActual();
+        if (actual == null || actual instanceof Jugador) return;
+
+        // Es un enemigo, ejecutar su IA
+        IAEnemigo.ejecutar(actual, jugador, habitacionActual, turnoManager, log);
+
+        // Comprobar si el jugador murió en este ataque
+        if (!jugador.estaVivo()) {
+            gameOver = true;
+            log.add("Fin del juego. Has sido derrotado.");
+        }
+
+        // Finalizar el turno del enemigo
+        turnoManager.finalizarTurno();
+    }
+    public void setTurnoManager(TurnoManager tm) {
+        this.turnoManager = tm;
+    }
+}

@@ -1,5 +1,6 @@
 package controlador;
 
+import modelo.HabitacionModelo;
 import modelo.Direction;
 import modelo.Jugador;
 import modelo.Posicion;                       // ← desde modelo
@@ -8,7 +9,7 @@ import mundo.Objeto;
 import listas.ListaSimplementeEnlazada;      // tu estructura propia
 
 public interface GameControllerModel {
-    Habitacion getCurrentRoom();
+    HabitacionModelo getCurrentRoom();
     Jugador getPlayer();
     ListaSimplementeEnlazada<Objeto> getInventory();
     ListaSimplementeEnlazada<String> getEventLog();

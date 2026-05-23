@@ -1,6 +1,7 @@
 package controlador;
 
 import modelo.Direction;
+import modelo.HabitacionModelo;
 import modelo.Jugador;
 import modelo.Posicion;
 import mundo.Habitacion;
@@ -16,16 +17,18 @@ public class GameControllerDummy implements GameControllerModel {
     private String[][] mapa;
     private int jugadorFila = 2;
     private int jugadorCol = 2;
+    private HabitacionModelo habitacion;
 
     public GameControllerDummy() {
         log = new ListaSimplementeEnlazada<>();
         inventario = new ListaSimplementeEnlazada<>();
+        habitacion = new Habitacion("Sala de pruebas",filas,columnas);
 
         log.add("Juego iniciado (modo dummy)");
 
         // Añadir objetos de prueba al inventario
-        inventario.add(new Objeto("Poción"));
-        inventario.add(new Objeto("Espada"));
+        inventario.add(new Objeto("poc1", "Poción", "pocion"));
+        inventario.add(new Objeto("esp1", "Espada", "arma"));
 
         inicializarMapa();
     }
@@ -44,8 +47,8 @@ public class GameControllerDummy implements GameControllerModel {
     }
 
     @Override
-    public Habitacion getCurrentRoom() {
-        return new Habitacion("Sala de pruebas");
+    public HabitacionModelo getCurrentRoom() {
+        return habitacion;
     }
 
     @Override
@@ -116,7 +119,7 @@ public class GameControllerDummy implements GameControllerModel {
             mapa[pos.getFila()][pos.getColumna()] = "·";
             log.add("Objeto recogido");
             // Añadir a inventario (simulado)
-            inventario.add(new Objeto("Objeto recogido"));
+            inventario.add(new Objeto("recogido1", "Objeto recogido", "misc"));
             return true;
         }
         return false;

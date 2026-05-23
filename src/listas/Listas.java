@@ -1,6 +1,6 @@
 package listas;
 
-public interface Listas<T extends Comparable<T>> {
+public interface Listas<T> {
     void add(T dato);
     T get(T dato);
     T del(T dato);

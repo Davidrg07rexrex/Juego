@@ -2,21 +2,31 @@ package controlador;
 
 import modelo.Direction;
 import modelo.Jugador;
+import modelo.Posicion;
 import mundo.Habitacion;
 import mundo.Objeto;
-import mundo.Posicion;
-import java.util.ArrayList;
-import java.util.List;
+import listas.ListaSimplementeEnlazada;
 
 public class GameControllerDummy implements GameControllerModel {
-    private List<String> log;
+
+    private ListaSimplementeEnlazada<String> log;
+    private ListaSimplementeEnlazada<Objeto> inventario;
     private int filas = 5;
     private int columnas = 5;
     private String[][] mapa;
+    private int jugadorFila = 2;
+    private int jugadorCol = 2;
 
     public GameControllerDummy() {
-        log = new ArrayList<>();
+        log = new ListaSimplementeEnlazada<>();
+        inventario = new ListaSimplementeEnlazada<>();
+
         log.add("Juego iniciado (modo dummy)");
+
+        // Añadir objetos de prueba al inventario
+        inventario.add(new Objeto("Poción"));
+        inventario.add(new Objeto("Espada"));
+
         inicializarMapa();
     }
 
@@ -24,11 +34,10 @@ public class GameControllerDummy implements GameControllerModel {
         mapa = new String[filas][columnas];
         for (int i = 0; i < filas; i++) {
             for (int j = 0; j < columnas; j++) {
-                mapa[i][j] = "·";   // vacío
+                mapa[i][j] = "·";
             }
         }
-        // Colocar jugador (J), enemigo (E), objeto (O), puerta (P)
-        mapa[2][2] = "J";
+        mapa[jugadorFila][jugadorCol] = "J";
         mapa[2][3] = "E";
         mapa[1][1] = "O";
         mapa[3][3] = "P";
@@ -41,19 +50,16 @@ public class GameControllerDummy implements GameControllerModel {
 
     @Override
     public Jugador getPlayer() {
-        return new Jugador("Héroe", 100, 10, 5, 3);
+        return new Jugador("Héroe", 100, 10, 5, new Posicion(jugadorFila, jugadorCol));
     }
 
     @Override
-    public List<Objeto> getInventory() {
-        List<Objeto> inv = new ArrayList<>();
-        inv.add(new Objeto("Poción"));
-        inv.add(new Objeto("Espada"));
-        return inv;
+    public ListaSimplementeEnlazada<Objeto> getInventory() {
+        return inventario;
     }
 
     @Override
-    public List<String> getEventLog() {
+    public ListaSimplementeEnlazada<String> getEventLog() {
         return log;
     }
 
@@ -65,34 +71,42 @@ public class GameControllerDummy implements GameControllerModel {
     @Override
     public boolean movePlayer(Direction dir) {
         log.add("Mover hacia " + dir);
-        // Aquí dummy: simplemente actualiza la matriz para que J se mueva un paso (opcional)
-        // Para simular, movemos la J en la matriz (búsqueda simple)
         for (int i = 0; i < filas; i++) {
             for (int j = 0; j < columnas; j++) {
-                if (mapa[i][j].equals("J")) {
-                    mapa[i][j] = "·";  // borrar posición actual
+                if ("J".equals(mapa[i][j])) {
+                    mapa[i][j] = "·";
+                    int nuevaFila = i, nuevaCol = j;
                     switch (dir) {
-                        case UP:    if (i-1 >= 0) mapa[i-1][j] = "J"; break;
-                        case DOWN:  if (i+1 < filas) mapa[i+1][j] = "J"; break;
-                        case LEFT:  if (j-1 >= 0) mapa[i][j-1] = "J"; break;
-                        case RIGHT: if (j+1 < columnas) mapa[i][j+1] = "J"; break;
+                        case UP:    nuevaFila = i - 1; break;
+                        case DOWN:  nuevaFila = i + 1; break;
+                        case LEFT:  nuevaCol = j - 1; break;
+                        case RIGHT: nuevaCol = j + 1; break;
+                        default: return false;
                     }
-                    return true;
+                    if (nuevaFila >= 0 && nuevaFila < filas && nuevaCol >= 0 && nuevaCol < columnas) {
+                        mapa[nuevaFila][nuevaCol] = "J";
+                        jugadorFila = nuevaFila;
+                        jugadorCol = nuevaCol;
+                        return true;
+                    } else {
+                        mapa[i][j] = "J";
+                        return false;
+                    }
                 }
             }
         }
-        return true;
+        return false;
     }
 
     @Override
     public boolean attack(Posicion pos) {
         log.add("Atacar en " + pos);
-        // dummy: si en esa posición hay 'E', lo elimina
         if (mapa[pos.getFila()][pos.getColumna()].equals("E")) {
             mapa[pos.getFila()][pos.getColumna()] = "·";
             log.add("Enemigo eliminado");
+            return true;
         }
-        return true;
+        return false;
     }
 
     @Override
@@ -101,8 +115,11 @@ public class GameControllerDummy implements GameControllerModel {
         if (mapa[pos.getFila()][pos.getColumna()].equals("O")) {
             mapa[pos.getFila()][pos.getColumna()] = "·";
             log.add("Objeto recogido");
+            // Añadir a inventario (simulado)
+            inventario.add(new Objeto("Objeto recogido"));
+            return true;
         }
-        return true;
+        return false;
     }
 
     @Override

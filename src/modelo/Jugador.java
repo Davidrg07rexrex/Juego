@@ -1,10 +1,10 @@
 package modelo;
 
-public class Jugador {
+public class Jugador extends Entidad{
     private String nombre;
     private int vida, ataque, defensa, velocidad;
 
-    public Jugador(String nombre, int vida, int ataque, int defensa, int velocidad) {
+    public Jugador(String nombre, int vida, int ataque, int defensa, Posicion posicion) {
         this.nombre = nombre;
         this.vida = vida;
         this.ataque = ataque;

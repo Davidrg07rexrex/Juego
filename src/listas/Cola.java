@@ -1,46 +1,46 @@
 package listas;
 
-public class Cola<T extends Comparable<T>> {
+public class Cola<T> {
     private ListaSimplementeEnlazada<T> lista;
 
-    public Cola(){
-        this.lista=new ListaSimplementeEnlazada<>();
+    public Cola() {
+        this.lista = new ListaSimplementeEnlazada<>();
     }
 
-    public void encolar(T dato){
-        //Objetivo:Añadir un elemento al final de la cola
+    public void encolar(T dato) {
         lista.add(dato);
     }
 
-    public T desencolar(){
-        //Objetivo:Eliminar y devolver el elemento del frente de la cola
-        if(lista.estaVacia()) return null;
-        return lista.del(lista.getDatoEn(0));
+    public T desencolar() {
+        if (lista.estaVacia()) return null;
+        T dato = lista.getDatoEn(0);
+        lista.remove(dato);   // usa remove con equals
+        return dato;
     }
 
-    public T frente(){
-        //Objetivo:Ver el elemento del frente sin eliminarlo
-        if(lista.estaVacia()) return null;
+    public T frente() {
+        if (lista.estaVacia()) return null;
         return lista.getDatoEn(0);
     }
 
-    public boolean estaVacia(){
-        //Objetivo:Comprobar si la cola está vacía
+    public boolean estaVacia() {
         return lista.estaVacia();
     }
 
-    public int getTamaño(){
-        //Objetivo:Devolver el número de elementos
+    public int getTamaño() {
         return lista.getTamaño();
     }
 
-    public void clear(){
-        //Objetivo:Vaciar la cola
+    public void clear() {
         lista.clear();
     }
 
-    public void imprimir(){
-        //Objetivo:Mostrar todos los elementos de la cola
+    public void imprimir() {
         lista.imprimir();
+    }
+
+    // NUEVO: eliminar un elemento concreto
+    public void eliminar(T dato) {
+        lista.remove(dato);
     }
 }

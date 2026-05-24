@@ -1,5 +1,6 @@
 package modelo;
-import modelo.Entidad;
+
+import mundo.Objeto;
 
 public interface HabitacionModelo {
     int getFilas();
@@ -10,4 +11,5 @@ public interface HabitacionModelo {
     void eliminarEnemigo(int fila, int columna);
     void eliminarObjeto(int fila, int columna);   // para recoger objetos más tarde// ← nuevo
     void moverEnemigo(Entidad enemigo, int nuevaFila, int nuevaColumna);
+    Objeto getObjetoEn(int fila, int columna);
 }

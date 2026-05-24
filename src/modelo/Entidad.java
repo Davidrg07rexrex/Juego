@@ -23,6 +23,7 @@ public abstract class Entidad {
     public int getDefensa() { return defensa; }
     public Posicion getPosicion() { return posicion; }
     public void setPosicion(Posicion posicion) { this.posicion = posicion; }
+    public void setAtaque(int ataque) { this.ataque = ataque; }
 
     public boolean estaVivo() {
         return vida > 0;

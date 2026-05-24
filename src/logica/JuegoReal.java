@@ -77,16 +77,72 @@ public class JuegoReal implements GameControllerModel {
 
     @Override
     public boolean pickItem(Posicion pos) {
-        // TODO: comprobar si en la celda hay un objeto, añadirlo al inventario, quitarlo de la habitación.
-        log.add("Recoger en " + pos + " (no implementado aún)");
-        return false;
+        if (gameOver || turnoManager == null) return false;
+        if (turnoManager.getEntidadActual() != jugador) return false;
+
+        Objeto obj = habitacionActual.getObjetoEn(pos.getFila(), pos.getColumna());
+        if (obj == null) {
+            log.add("No hay ningún objeto en " + pos);
+            return false;
+        }
+
+        // Verificar que el jugador está adyacente (opcional, según diseño; asumimos que sí)
+        Posicion pJugador = jugador.getPosicion();
+        int dist = Math.abs(pJugador.getFila() - pos.getFila()) + Math.abs(pJugador.getColumna() - pos.getColumna());
+        if (dist > 1) {
+            log.add("Estás demasiado lejos para recoger el objeto.");
+            return false;
+        }
+
+        jugador.agregarAlInventario(obj);
+        habitacionActual.eliminarObjeto(pos.getFila(), pos.getColumna());
+        log.add("Has recogido " + obj.getNombre());
+        return true;
     }
 
     @Override
     public boolean useItem(Objeto item) {
-        // TODO: aplicar efecto del objeto, eliminarlo del inventario.
-        log.add("Usar objeto " + item.getNombre() + " (no implementado aún)");
-        return false;
+        if (gameOver || turnoManager == null) return false;
+        if (turnoManager.getEntidadActual() != jugador) return false;
+
+        // Buscar el objeto en el inventario del jugador
+        ListaSimplementeEnlazada<Objeto> inventario = jugador.getInventario();
+        boolean encontrado = false;
+        for (int i = 0; i < inventario.getTamaño(); i++) {
+            if (inventario.getDatoEn(i).equals(item)) {
+                encontrado = true;
+                break;
+            }
+        }
+        if (!encontrado) {
+            log.add("No tienes ese objeto en el inventario.");
+            return false;
+        }
+
+        String tipo = item.getTipo();
+        switch (tipo) {
+            case "pocion":
+                int curacion = 20; // podrías leerlo de algún atributo extra si lo tuvieras
+                int nuevaVida = jugador.getVida() + curacion;
+                if (nuevaVida > jugador.getVidaMaxima()) nuevaVida = jugador.getVidaMaxima();
+                jugador.setVida(nuevaVida);
+                log.add("Usas " + item.getNombre() + " y recuperas " + curacion + " puntos de vida.");
+                break;
+            case "arma":
+                // Equipamiento simple: aumenta ataque temporalmente
+                int bonus = 5; // idealmente obtenerlo de item (ej. ((Arma)item).getBonusAtaque())
+                jugador.setAtaque(jugador.getAtaque() + bonus);
+                log.add("Equipas " + item.getNombre() + " (Ataque +" + bonus + ").");
+                // No eliminamos el arma del inventario (se equipa)
+                return true; // no se consume
+            default:
+                log.add("No puedes usar ese objeto.");
+                return false;
+        }
+
+        // Eliminar el objeto del inventario (para consumibles)
+        inventario.remove(item);
+        return true;
     }
 
     @Override

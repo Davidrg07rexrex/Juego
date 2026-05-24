@@ -21,4 +21,7 @@ public class Jugador extends Entidad {
             objetivo.recibirDanio(this.ataque);
         }
     }
+    public void agregarAlInventario(Objeto obj) {
+        inventario.add(obj);
+    }
 }

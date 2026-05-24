@@ -59,4 +59,9 @@ public class Habitacion implements HabitacionModelo {
     public void moverEnemigo(Entidad enemigo, int nuevaFila, int nuevaColumna) {
         // Provisional: no hay matriz real aún
     }
+    @Override
+    public Objeto getObjetoEn(int fila, int columna) {
+        // provisional
+        return null;
+    }
 }

@@ -103,12 +103,21 @@ public class GameControllerDummy implements GameControllerModel {
 
     @Override
     public boolean attack(Posicion pos) {
+        int fila = pos.getFila();
+        int col = pos.getColumna();
+
+        if (fila < 0 || fila >= filas || col < 0 || col >= columnas) {
+            return false;
+        }
+
         log.add("Atacar en " + pos);
-        if (mapa[pos.getFila()][pos.getColumna()].equals("E")) {
-            mapa[pos.getFila()][pos.getColumna()] = "·";
+
+        if (mapa[fila][col].equals("E")) {
+            mapa[fila][col] = "·";
             log.add("Enemigo eliminado");
             return true;
         }
+
         return false;
     }
 
@@ -157,5 +166,18 @@ public class GameControllerDummy implements GameControllerModel {
             return mapa[row][col];
         }
         return "?";
+    }
+
+    public boolean attackNearbyEnemy() {
+        int fila = jugadorFila;
+        int col = jugadorCol;
+
+        if (attack(new Posicion(fila - 1, col))) return true; // arriba
+        if (attack(new Posicion(fila + 1, col))) return true; // abajo
+        if (attack(new Posicion(fila, col - 1))) return true; // izquierda
+        if (attack(new Posicion(fila, col + 1))) return true; // derecha
+
+        log.add("No hay enemigo cerca");
+        return false;
     }
 }

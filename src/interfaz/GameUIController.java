@@ -5,6 +5,7 @@ import javafx.scene.control.Button;
 import logica.JuegoReal;
 import modelo.*;
 import mundo.HabitacionMock;
+import mundo.Enemigo;
 
 public class GameUIController {
 
@@ -31,6 +32,19 @@ public class GameUIController {
         );
 
         juego = new JuegoReal(jugador, habitacion);
+
+        Enemigo enemigo = new Enemigo(
+                "E1",
+                "Goblin",
+                30,
+                5,
+                2,
+                1
+        );
+
+        enemigo.setPosicion(new Posicion(0, 2));
+
+        ((HabitacionMock) habitacion).colocarEnemigo(enemigo);
     }
 
     public void setView(GameView view) {

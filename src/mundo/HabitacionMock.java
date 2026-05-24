@@ -40,7 +40,17 @@ public class HabitacionMock implements HabitacionModelo {
 
     @Override
     public String getSimbolo(int fila, int columna) {
-        return "·"; // no necesario para la prueba
+
+        for (int i = 0; i < enemigos.getTamaño(); i++) {
+            Enemigo e = enemigos.getDatoEn(i);
+            Posicion p = e.getPosicion();
+
+            if (p.getFila() == fila && p.getColumna() == columna && e.estaVivo()) {
+                return "E";
+            }
+        }
+
+        return "·";
     }
 
     @Override

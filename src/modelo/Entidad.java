@@ -24,8 +24,26 @@ public abstract class Entidad {
     public Posicion getPosicion() { return posicion; }
     public void setPosicion(Posicion posicion) { this.posicion = posicion; }
 
-    public boolean estaVivo() { return vida > 0; }
+    public boolean estaVivo() {
+        return vida > 0;
+    }
+
+    public void recibirDanio(int danio) {
+        int danioFinal = danio - defensa;
+
+        if (danioFinal < 1) {
+            danioFinal = 1;
+        }
+
+        vida -= danioFinal;
+
+        if (vida < 0) {
+            vida = 0;
+        }
+    }
 
     @Override
-    public String toString() { return nombre; }
+    public String toString() {
+        return nombre;
+    }
 }

@@ -4,6 +4,7 @@ import listas.ListaSimplementeEnlazada;
 import mundo.Objeto;
 
 public class Jugador extends Entidad {
+
     private ListaSimplementeEnlazada<Objeto> inventario;
 
     public Jugador(String nombre, int vida, int ataque, int defensa, Posicion posicion) {
@@ -15,7 +16,9 @@ public class Jugador extends Entidad {
         return inventario;
     }
 
-    // Aquí puedes añadir métodos adicionales como:
-    // public void agregarAlInventario(Objeto o) { ... }
-    // public void usarItem(Objeto o) { ... }
+    public void atacar(Entidad objetivo) {
+        if (objetivo != null && objetivo.estaVivo()) {
+            objetivo.recibirDanio(this.ataque);
+        }
+    }
 }

@@ -124,7 +124,7 @@ public class JuegoReal implements GameControllerModel {
             case "pocion":
                 int curacion = 20; // podrías leerlo de algún atributo extra si lo tuvieras
                 int nuevaVida = jugador.getVida() + curacion;
-                if (nuevaVida > jugador.getVidaMaxima()) nuevaVida = jugador.getVidaMaxima();
+                if (nuevaVida > 100) nuevaVida = 100;
                 jugador.setVida(nuevaVida);
                 log.add("Usas " + item.getNombre() + " y recuperas " + curacion + " puntos de vida.");
                 break;

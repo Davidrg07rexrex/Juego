@@ -69,12 +69,6 @@ public class GameView {
 
         inventarioList.setPrefHeight(120);
 
-        inventarioList.getItems().addAll(
-                "Poción",
-                "Llave",
-                "Espada"
-        );
-
         moverButton = new Button("Mover");
 
         atacarButton = new Button("Atacar");
@@ -173,5 +167,13 @@ public class GameView {
 
     public void escribirEvento(String texto) {
         registroEventos.appendText(texto + "\n");
+    }
+
+    public ListView<String> getInventarioList() {
+        return inventarioList;
+    }
+
+    public TextArea getRegistroEventos() {
+        return registroEventos;
     }
 }

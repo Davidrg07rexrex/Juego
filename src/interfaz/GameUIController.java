@@ -116,11 +116,27 @@ public class GameUIController {
 
         } else if (modoActual.equals("ATACAR")) {
 
-            view.escribirEvento("Atacar (" + fila + "," + columna + ")");
+            boolean ok = juego.attack(new Posicion(fila, columna));
+
+            if (ok) {
+                view.escribirEvento("Ataque realizado en (" + fila + "," + columna + ")");
+            } else {
+                view.escribirEvento("No se puede atacar en esa posición.");
+            }
+
+            refrescarVista();
 
         } else if (modoActual.equals("RECOGER")) {
 
-            view.escribirEvento("Recoger en (" + fila + "," + columna + ")");
+            boolean ok = juego.pickItem(new Posicion(fila, columna));
+
+            if (ok) {
+                view.escribirEvento("Objeto recogido en (" + fila + "," + columna + ")");
+            } else {
+                view.escribirEvento("No hay objeto para recoger ahí.");
+            }
+
+            refrescarVista();
 
         } else {
 
@@ -161,6 +177,16 @@ public class GameUIController {
         view.setAtaque(String.valueOf(juego.getPlayer().getAtaque()));
 
         view.setDefensa(String.valueOf(juego.getPlayer().getDefensa()));
+
+        // Refrescar inventario
+        view.getInventarioList().getItems().clear();
+
+        for (int i = 0; i < juego.getInventory().getTamaño(); i++) {
+
+            view.getInventarioList().getItems().add(
+                    juego.getInventory().getDatoEn(i).getNombre()
+            );
+        }
     }
 
 
@@ -187,16 +213,20 @@ public class GameUIController {
 
     public void guardarPartida() {
 
-        view.escribirEvento("Guardando partida...");
+        juego.saveGame("partida.json");
+        view.escribirEvento("Partida guardada en partida.json");
+        refrescarVista();
     }
 
     public void usarObjetoSeleccionado() {
 
-        view.escribirEvento("Usar objeto seleccionado.");
+        view.escribirEvento("Selecciona un objeto del inventario para usarlo.");
     }
 
     public void cargarPartida() {
 
-        view.escribirEvento("Cargando partida...");
+        juego.loadGame("partida.json");
+        view.escribirEvento("Partida cargada desde partida.json");
+        refrescarVista();
     }
 }

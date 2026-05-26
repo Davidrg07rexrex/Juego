@@ -10,7 +10,7 @@ public class HabitacionMock implements HabitacionModelo {
     private int filas;
     private int columnas;
     private ListaSimplementeEnlazada<Enemigo> enemigos;
-    private Objeto[][] matrizObjetos;   // nuevo
+    private Objeto[][] matrizObjetos;
 
     public HabitacionMock(String nombre, int filas, int columnas) {
         this.nombre = nombre;
@@ -18,6 +18,14 @@ public class HabitacionMock implements HabitacionModelo {
         this.columnas = columnas;
         this.enemigos = new ListaSimplementeEnlazada<>();
         this.matrizObjetos = new Objeto[filas][columnas];
+    }
+
+    @Override
+    public String getId() { return nombre; }
+
+    @Override
+    public int compareTo(HabitacionModelo o) {
+        return this.nombre.compareTo(o.getId());
     }
 
     public void colocarEnemigo(Enemigo e) { enemigos.add(e); }
@@ -83,4 +91,19 @@ public class HabitacionMock implements HabitacionModelo {
         }
         return null;
     }
+
+    @Override
+    public String getDestinoPuerta(int fila, int columna) { return null; }
+
+    @Override
+    public boolean puertaNecesitaLlave(int fila, int columna) { return false; }
+
+    @Override
+    public String getIdLlavePuerta(int fila, int columna) { return null; }
+
+    @Override
+    public boolean esTrampa(int fila, int columna) { return false; }
+
+    @Override
+    public int getDanioTrampa(int fila, int columna) { return 0; }
 }

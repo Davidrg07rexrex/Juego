@@ -1,67 +1,318 @@
 package mundo;
 
+import java.util.Map;
+import io.DatosPartida.DatosCelda;
 import modelo.Entidad;
 import modelo.HabitacionModelo;
+import modelo.Posicion;
 
+// Representa una habitacion del juego compuesta por una matriz de celdas
 public class Habitacion implements HabitacionModelo {
-    private String nombre;
-    private int filas;
-    private int columnas;
+    private String id;                   // Identificador unico de la habitacion
+    private String nombre;               // Nombre para mostrar
+    private Celda[][] matriz;            // MATRIZ: el array bidimensional de celdas
+    private int filas;                   // Numero de filas de la matriz
+    private int columnas;                // Numero de columnas de la matriz
+    private boolean esSalida;            // Si esta habitacion es la salida del juego
 
-    // Constructor con dimensiones variables
-    public Habitacion(String nombre, int filas, int columnas) {
+    // Constructor: crea la habitacion con su matriz vacia
+    public Habitacion(String id, String nombre, int filas, int columnas) {
+        this.id = id;
         this.nombre = nombre;
         this.filas = filas;
         this.columnas = columnas;
+        this.esSalida = false;
+        
+        // Creo la matriz con el array bidimensional
+        this.matriz = new Celda[filas][columnas];
+        
+        // Recorro toda la matriz y creo celdas vacias
+        for (int i = 0; i < filas; i++) {
+            for (int j = 0; j < columnas; j++) {
+                matriz[i][j] = new Celda(i, j);  // Cada celda vacia por defecto
+            }
+        }
     }
 
-    @Override
-    public int getFilas() {
-        return filas;
+    // ----- GETTERS BASICOS -----
+    public String getId() { return id; }
+    public String getNombre() { return nombre; }
+    public Celda[][] getMatriz() { return matriz; }
+    public int getFilas() { return filas; }
+    public int getColumnas() { return columnas; }
+    public boolean esSalida() { return esSalida; }
+    public void setEsSalida(boolean esSalida) { this.esSalida = esSalida; }
+
+    // Obtener una celda especifica por sus coordenadas
+    public Celda getCelda(int fila, int columna) {
+        if (!celdaValida(fila, columna)) {
+            return null;  // Posicion fuera de la matriz
+        }
+        return matriz[fila][columna];
     }
 
-    @Override
-    public int getColumnas() {
-        return columnas;
-    }
-
-    @Override
-    public boolean esTransitable(int fila, int columna) {
-        // Provisional: solo comprueba límites, sin obstáculos
+    // Comprueba si una posicion esta dentro de los limites
+    public boolean celdaValida(int fila, int columna) {
         return fila >= 0 && fila < filas && columna >= 0 && columna < columnas;
     }
 
-    @Override
-    public String getSimbolo(int fila, int columna) {
-        // Provisional: devuelve siempre "·" (vacío)
-        return "·";
+    // Coloca un enemigo en una celda especifica
+    public void colocarEnemigo(int fila, int columna, Enemigo enemigo) {
+        Celda celda = getCelda(fila, columna);
+        if (celda != null) {
+            celda.setTipo("enemigo");
+            celda.setContenido(enemigo);
+            enemigo.setPosicion(new Posicion(fila, columna));
+        }
     }
 
-    // Getter para el nombre, si lo necesitas
-    public String getNombre() {
-        return nombre;
+    // Coloca un objeto en una celda especifica
+    public void colocarObjeto(int fila, int columna, Objeto objeto) {
+        Celda celda = getCelda(fila, columna);
+        if (celda != null) {
+            celda.setTipo("objeto");
+            celda.setContenido(objeto);
+        }
     }
-    @Override
+
+    // Coloca una puerta en una celda especifica
+    public void colocarPuerta(int fila, int columna, String idDestino) {
+        Celda celda = getCelda(fila, columna);
+        if (celda != null) {
+            celda.setTipo("puerta");
+            // Guardo el id de la habitacion destino como contenido
+            celda.setContenido(idDestino);
+        }
+    }
+
+    // Coloca una puerta que necesita llave
+    public void colocarPuertaConLlave(int fila, int columna, String idDestino, String idLlave) {
+        Celda celda = getCelda(fila, columna);
+        if (celda != null) {
+            celda.setTipo("puerta");
+            // Guardo destino:llave como contenido para saber que llave necesita
+            celda.setContenido(idDestino + ":" + idLlave);
+        }
+    }
+
+    // Coloca una trampa en una celda
+    public void colocarTrampa(int fila, int columna) {
+        Celda celda = getCelda(fila, columna);
+        if (celda != null) {
+            celda.setTipo("trampa");
+            celda.setAccesible(false);
+        }
+    }
+
+    // Limpia una celda (la deja vacia)
+    public void limpiarCelda(int fila, int columna) {
+        Celda celda = getCelda(fila, columna);
+        if (celda != null) {
+            celda.setTipo("vacia");
+            celda.setContenido(null);
+            celda.setAccesible(true);
+        }
+    }
+
+    // Busca un enemigo en la matriz por sus coordenadas
     public Entidad getEnemigoEn(int fila, int columna) {
-        // Provisional: no hay enemigos aún, devolvemos null
+        Celda celda = getCelda(fila, columna);
+        if (celda != null && celda.getTipo().equals("enemigo")) {
+            return (Enemigo) celda.getContenido();
+        }
         return null;
     }
+
+    // Busca un objeto en la matriz por sus coordenadas
+    public Objeto getObjetoEn(int fila, int columna) {
+        Celda celda = getCelda(fila, columna);
+        if (celda != null && celda.getTipo().equals("objeto")) {
+            return (Objeto) celda.getContenido();
+        }
+        return null;
+    }
+
+    // Compara dos habitaciones por su id
     @Override
-    public void eliminarEnemigo(int fila, int columna) {
-        // provisional: nada que hacer hasta que haya matriz real
+    public int compareTo(HabitacionModelo o) {
+        return this.id.compareTo(o.getId());
     }
 
     @Override
-    public void eliminarObjeto(int fila, int columna) {
-        // provisional
+    public String toString() {
+        return nombre + " (" + filas + "x" + columnas + ")" + (esSalida ? " [SALIDA]" : "");
     }
-    @Override
+
+    //Metodo que coloca una puerta guardando el objeto Puerta
+    public void colocarPuerta(int fila, int columna, Puerta puerta) {
+        Celda celda = getCelda(fila, columna);
+        if (celda != null) {
+            celda.setTipo("puerta");
+            celda.setContenido(puerta);
+        }
+    }
+
+    //Metodo que coloca una puerta con llave guardando el objeto Puerta
+    public void colocarPuertaConLlave(int fila, int columna, Puerta puerta) {
+        colocarPuerta(fila, columna, puerta);
+    }
+
+    //Metodo que coloca una trampa con un danio especifico
+    public void colocarTrampa(int fila, int columna, Trampa trampa) {
+        Celda celda = getCelda(fila, columna);
+        if (celda != null) {
+            celda.setTipo("trampa");
+            celda.setAccesible(false);
+            celda.setContenido(trampa);
+        }
+    }
+
+    //Metodo que devuelve si se puede pasar por una celda
+    public boolean esTransitable(int fila, int columna) {
+        if (!celdaValida(fila, columna)) return false;
+        Celda celda = getCelda(fila, columna);
+        if (celda == null) return false;
+        if (!celda.isAccesible()) return false;
+        String tipo = celda.getTipo();
+        return !tipo.equals("enemigo") && !tipo.equals("trampa");
+    }
+
+    //Metodo que devuelve el simbolo de una celda
+    public String getSimbolo(int fila, int columna) {
+        Celda celda = getCelda(fila, columna);
+        if (celda == null) return "?";
+        String tipo = celda.getTipo();
+        if (tipo.equals("vacia")) return "·";
+        if (tipo.equals("enemigo")) return "E";
+        if (tipo.equals("objeto")) return "O";
+        if (tipo.equals("puerta")) return "P";
+        if (tipo.equals("trampa")) return "T";
+        return "?";
+    }
+
+    //Metodo que elimina un enemigo de una celda
+    public void eliminarEnemigo(int fila, int columna) {
+        limpiarCelda(fila, columna);
+    }
+
+    //Metodo que mueve un enemigo a otra celda
     public void moverEnemigo(Entidad enemigo, int nuevaFila, int nuevaColumna) {
-        // Provisional: no hay matriz real aún
+        Posicion pos = enemigo.getPosicion();
+        if (pos != null) {
+            limpiarCelda(pos.getFila(), pos.getColumna());
+        }
+        if (enemigo instanceof Enemigo) {
+            colocarEnemigo(nuevaFila, nuevaColumna, (Enemigo) enemigo);
+        }
     }
-    @Override
-    public Objeto getObjetoEn(int fila, int columna) {
-        // provisional
+
+    //Metodo que elimina un objeto de una celda
+    public void eliminarObjeto(int fila, int columna) {
+        limpiarCelda(fila, columna);
+    }
+
+    //Metodo que devuelve el destino de una puerta
+    public String getDestinoPuerta(int fila, int columna) {
+        Celda celda = getCelda(fila, columna);
+        if (celda != null && celda.getTipo().equals("puerta") && celda.getContenido() instanceof Puerta) {
+            return ((Puerta) celda.getContenido()).getIdDestino();
+        }
         return null;
+    }
+
+    //Metodo que devuelve si una puerta necesita llave
+    public boolean puertaNecesitaLlave(int fila, int columna) {
+        Celda celda = getCelda(fila, columna);
+        if (celda != null && celda.getTipo().equals("puerta") && celda.getContenido() instanceof Puerta) {
+            return ((Puerta) celda.getContenido()).necesitaLlave();
+        }
+        return false;
+    }
+
+    //Metodo que devuelve el id de la llave que necesita una puerta
+    public String getIdLlavePuerta(int fila, int columna) {
+        Celda celda = getCelda(fila, columna);
+        if (celda != null && celda.getTipo().equals("puerta") && celda.getContenido() instanceof Puerta) {
+            return ((Puerta) celda.getContenido()).getIdLlaveRequerida();
+        }
+        return null;
+    }
+
+    //Metodo que devuelve si una celda es una trampa
+    public boolean esTrampa(int fila, int columna) {
+        Celda celda = getCelda(fila, columna);
+        if (celda == null) return false;
+        return celda.getTipo().equals("trampa");
+    }
+
+    //Metodo que devuelve el danio de una trampa
+    public int getDanioTrampa(int fila, int columna) {
+        Celda celda = getCelda(fila, columna);
+        if (celda != null && celda.getTipo().equals("trampa") && celda.getContenido() instanceof Trampa) {
+            return ((Trampa) celda.getContenido()).getDanio();
+        }
+        return 0;
+    }
+
+    //Metodo que inicializa la habitacion desde una matriz de datos
+    public void inicializarDesdeMatriz(DatosCelda[][] datosMatriz, Map<String, Objeto> mapaObjetos, Map<String, Enemigo> mapaEnemigos) {
+        for (int i = 0; i < datosMatriz.length; i++) {
+            for (int j = 0; j < datosMatriz[i].length; j++) {
+                DatosCelda dato = datosMatriz[i][j];
+                if (dato == null) continue;
+
+                String tipo = dato.tipo;
+                if (tipo == null || tipo.equals("vacia")) continue;
+
+                int fila = dato.fila;
+                int columna = dato.columna;
+
+                if (tipo.equals("objeto")) {
+                    if (dato.contenido instanceof Map) {
+                        Map<String, Object> mapObj = (Map<String, Object>) dato.contenido;
+                        String idObj = (String) mapObj.get("id");
+                        if (idObj != null && mapaObjetos.containsKey(idObj)) {
+                            colocarObjeto(fila, columna, mapaObjetos.get(idObj));
+                        }
+                    }
+                } else if (tipo.equals("enemigo")) {
+                    if (dato.contenido instanceof Map) {
+                        Map<String, Object> mapEnem = (Map<String, Object>) dato.contenido;
+                        String idEnem = (String) mapEnem.get("id");
+                        if (idEnem != null && mapaEnemigos.containsKey(idEnem)) {
+                            colocarEnemigo(fila, columna, mapaEnemigos.get(idEnem));
+                        }
+                    }
+                } else if (tipo.equals("puerta")) {
+                    if (dato.contenido instanceof Map) {
+                        Map<String, Object> datosPuerta = (Map<String, Object>) dato.contenido;
+                        String destino = (String) datosPuerta.get("destino");
+                        Celda celda = getCelda(fila, columna);
+                        if (destino != null && celda != null) {
+                            Boolean necesitaLlave = (Boolean) datosPuerta.get("necesitaLlave");
+                            if (necesitaLlave != null && necesitaLlave) {
+                                String idLlave = (String) datosPuerta.get("idLlave");
+                                Puerta puerta = new Puerta(destino, idLlave, celda);
+                                colocarPuerta(fila, columna, puerta);
+                            } else {
+                                Puerta puerta = new Puerta(destino, celda);
+                                colocarPuerta(fila, columna, puerta);
+                            }
+                        }
+                    }
+                } else if (tipo.equals("trampa")) {
+                    if (dato.contenido instanceof Map) {
+                        Map<String, Object> mapTrampa = (Map<String, Object>) dato.contenido;
+                        Object valDanio = mapTrampa.get("danio");
+                        int danio = 0;
+                        if (valDanio instanceof Number) {
+                            danio = ((Number) valDanio).intValue();
+                        }
+                        Trampa trampa = new Trampa(danio);
+                        colocarTrampa(fila, columna, trampa);
+                    }
+                }
+            }
+        }
     }
 }

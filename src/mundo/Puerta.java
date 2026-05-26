@@ -2,9 +2,7 @@ package mundo;
 
 import listas.ListaSimplementeEnlazada;
 
-/**
- * Representa una puerta entre habitaciones
- */
+// Representa una puerta entre habitaciones
 public class Puerta implements Comparable<Puerta>{
     private String idDestino;
     private boolean necesitaLlave;

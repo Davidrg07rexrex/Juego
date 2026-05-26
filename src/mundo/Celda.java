@@ -1,9 +1,6 @@
 package mundo;
 
-/**
- * Representa una celda dentro de la matriz de una habitacion
- * Una celda puede estar vacia o contener un elemento
- */
+// Representa una celda dentro de la matriz de una habitacion
 public class Celda implements Comparable<Celda>{
     private String tipo; //Tipo de contenido: "vacia", "enemigo", "objeto", "puerta", "salida", "trampa"
     private int fila;

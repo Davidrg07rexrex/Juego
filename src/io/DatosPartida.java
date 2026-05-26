@@ -6,18 +6,10 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 
-/**
- * Clase que guarda todos los datos de una partida del juego.
- * Sigue el mismo patron que el ejemplo de clase con Usuario:
- * usa metodos genericos guardar() y cargar() con Gson.
- * Las subclases internas son POJOs simples con constructor vacio
- * (necesario para que Gson funcione correctamente).
- */
+// Datos de una partida del juego
 public class DatosPartida {
 
-    /**
-     * Datos del jugador: nombre y estadisticas basicas.
-     */
+    // Datos del jugador
     public static class DatosJugador {
         public String nombre;
         public int vida;
@@ -26,14 +18,11 @@ public class DatosPartida {
         public int defensa;
         public int movimiento;
 
-        /** Constructor vacio que necesita Gson */
+        // Necesario para Gson
         public DatosJugador() {}
     }
 
-    /**
-     * Datos de la partida: habitacion actual, posicion del jugador
-     * y turnos restantes.
-     */
+    // Datos de la partida
     public static class DatosPartidaInfo {
         public String habitacionActual;
         public int fila;
@@ -41,13 +30,11 @@ public class DatosPartida {
         public int turnosRestantes;
         public int turnosMaximos;
 
-        /** Constructor vacio que necesita Gson */
+        // Necesario para Gson
         public DatosPartidaInfo() {}
     }
 
-    /**
-     * Datos de un objeto del juego (arma, pocion, llave, etc.).
-     */
+    // Datos de un objeto (arma, pocion, llave...)
     public static class DatosObjeto {
         public String id;
         public String nombre;
@@ -63,13 +50,11 @@ public class DatosPartida {
         public int usosMaximos;
         public int usosRestantes;
 
-        /** Constructor vacio que necesita Gson */
+        // Necesario para Gson
         public DatosObjeto() {}
     }
 
-    /**
-     * Equipamiento del jugador: todos los slots (manos, torso, cabeza, dedos).
-     */
+    // Slots de equipamiento del jugador
     public static class DatosEquipamiento {
         public String mano_derecha;
         public String mano_izquierda;
@@ -86,13 +71,11 @@ public class DatosPartida {
         public String dedo9;
         public String dedo10;
 
-        /** Constructor vacio que necesita Gson */
+        // Necesario para Gson
         public DatosEquipamiento() {}
     }
 
-    /**
-     * Datos de una celda del mapa: tipo, posicion y contenido.
-     */
+    // Datos de una celda del mapa
     public static class DatosCelda {
         public String tipo;
         public int fila;
@@ -100,25 +83,21 @@ public class DatosPartida {
         public boolean accesible;
         public Object contenido;
 
-        /** Constructor vacio que necesita Gson */
+        // Necesario para Gson
         public DatosCelda() {}
     }
 
-    /**
-     * Posicion en el mapa: habitacion, fila y columna.
-     */
+    // Posicion en el mapa
     public static class DatosPosicion {
         public String habitacion;
         public int fila;
         public int columna;
 
-        /** Constructor vacio que necesita Gson */
+        // Necesario para Gson
         public DatosPosicion() {}
     }
 
-    /**
-     * Datos de un enemigo ya colocado en el mapa, con su posicion.
-     */
+    // Datos de un enemigo colocado en el mapa
     public static class DatosEnemigoInfo {
         public String id;
         public String nombre;
@@ -128,13 +107,11 @@ public class DatosPartida {
         public int movimiento;
         public DatosPosicion posicion;
 
-        /** Constructor vacio que necesita Gson */
+        // Necesario para Gson
         public DatosEnemigoInfo() {}
     }
 
-    /**
-     * Datos completos de una habitacion con su matriz de celdas.
-     */
+    // Datos completos de una habitacion
     public static class DatosHabitacionCompleta {
         public String id;
         public String nombre;
@@ -143,25 +120,20 @@ public class DatosPartida {
         public boolean esSalida;
         public DatosCelda[][] matriz;
 
-        /** Constructor vacio que necesita Gson */
+        // Necesario para Gson
         public DatosHabitacionCompleta() {}
     }
 
-    /**
-     * Conexion entre dos habitaciones (arista del grafo).
-     */
+    // Conexion entre habitaciones
     public static class DatosConexion {
         public String origen;
         public String destino;
 
-        /** Constructor vacio que necesita Gson */
+        // Necesario para Gson
         public DatosConexion() {}
     }
 
-    /**
-     * Plantilla de enemigo disponible en la partida.
-     * Implementa Comparable para poder ordenar por id.
-     */
+    // Plantilla de enemigo
     public static class DatosEnemigoPlantilla implements Comparable<DatosEnemigoPlantilla> {
         public String id;
         public String nombre;
@@ -170,58 +142,31 @@ public class DatosPartida {
         public int defensa;
         public int movimiento;
 
-        /** Constructor vacio que necesita Gson */
+        // Necesario para Gson
         public DatosEnemigoPlantilla() {}
 
-        /** Ordena por id para poder comparar plantillas */
+        // Ordena por id
         @Override
         public int compareTo(DatosEnemigoPlantilla otro) {
             return this.id.compareTo(otro.id);
         }
     }
 
-    // Campos principales de DatosPartida
-
-    /** Datos del jugador */
+    // Campos principales
     public DatosJugador jugador;
-
-    /** Datos de la partida (habitacion, turnos, etc.) */
     public DatosPartidaInfo partida;
-
-    /** Objetos que lleva el jugador en el inventario */
     public DatosObjeto[] inventario;
-
-    /** Objetos equipados por el jugador */
     public DatosEquipamiento equipamiento;
-
-    /** Todos los objetos disponibles en la partida */
     public DatosObjeto[] objetosDisponibles;
-
-    /** Todas las plantillas de enemigos disponibles */
     public DatosEnemigoPlantilla[] enemigosDisponibles;
-
-    /** Todas las habitaciones del mapa */
     public DatosHabitacionCompleta[] habitaciones;
-
-    /** Todos los enemigos colocados en el mapa */
     public DatosEnemigoInfo[] enemigos;
-
-    /** Conexiones entre habitaciones (grafo) */
     public DatosConexion[] grafo;
 
-    /** Constructor vacio que necesita Gson */
+    // Necesario para Gson
     public DatosPartida() {}
 
-    /**
-     * Metodo generico para guardar un objeto en un archivo JSON.
-     * Igual que el ejemplo de clase con Usuario:
-     * usa GsonBuilder con setPrettyPrinting para que el JSON sea legible
-     * y FileWriter con try-with-resources para asegurar que se cierra.
-     *
-     * @param <T>    tipo del objeto a guardar
-     * @param ruta   ruta del archivo donde se guardara
-     * @param objeto objeto que se quiere guardar
-     */
+    // Guarda un objeto en JSON
     public static <T> void guardar(String ruta, T objeto) {
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
         try (FileWriter writer = new FileWriter(ruta)) {
@@ -231,16 +176,7 @@ public class DatosPartida {
         }
     }
 
-    /**
-     * Metodo generico para cargar un objeto desde un archivo JSON.
-     * Igual que el ejemplo de clase con Usuario:
-     * usa Gson simple y FileReader con try-with-resources.
-     *
-     * @param <T>   tipo del objeto a cargar
-     * @param ruta  ruta del archivo JSON
-     * @param clase clase del objeto que se quiere cargar
-     * @return      el objeto cargado, o null si hay error
-     */
+    // Carga un objeto desde JSON
     public static <T> T cargar(String ruta, Class<T> clase) {
         Gson gson = new Gson();
         try (FileReader reader = new FileReader(ruta)) {
@@ -250,5 +186,4 @@ public class DatosPartida {
             return null;
         }
     }
-
 }

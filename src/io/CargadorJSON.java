@@ -9,18 +9,11 @@ import io.Log;
 
 public class CargadorJSON {
 
-    /**
-     * Carga el JSON de partida y devuelve el POJO directamente.
-     * No convierte a objetos del juego, solo carga y muestra informacion.
-     * 
-     * @param ruta Ruta al archivo partida.json
-     * @return DatosPartida con todos los datos, o null si hay error
-     */
+    // Carga el JSON de partida y devuelve el POJO
     public static DatosPartida cargarCompleto(String ruta) {
         Log log = new Log();
         log.registrar("Cargando partida desde: " + ruta);
 
-        // Cargar el JSON a POJO usando Gson (como en clase con Usuario)
         DatosPartida datos = DatosPartida.cargar(ruta, DatosPartida.class);
 
         if (datos == null) {
@@ -28,13 +21,11 @@ public class CargadorJSON {
             return null;
         }
 
-        // Calcular cuantas conexiones hay en el grafo
         int numConexiones = 0;
         if (datos.grafo != null) {
             numConexiones = datos.grafo.length;
         }
 
-        // Mostrar resumen por pantalla
         System.out.println("===== RESUMEN DE PARTIDA =====");
         System.out.println("Objetos disponibles: " + contarArray(datos.objetosDisponibles));
         System.out.println("Plantillas de enemigos: " + contarArray(datos.enemigosDisponibles));
@@ -53,9 +44,7 @@ public class CargadorJSON {
         return datos;
     }
 
-    /**
-     * Cuenta cuantos elementos tiene un array, devuelve 0 si es null.
-     */
+    // Cuenta cuantos elementos tiene un array
     private static int contarArray(Object[] array) {
         if (array == null) {
             return 0;

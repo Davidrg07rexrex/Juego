@@ -304,17 +304,31 @@ public class JuegoReal implements GameControllerModel {
 
     private void ejecutarTurnoIA() {
         if (turnoManager == null || gameOver) return;
+
         Entidad actual = turnoManager.getEntidadActual();
-        if (actual == null || actual instanceof Jugador) return;
+
+        if (actual == null) {
+            gameOver = true;
+            log.add("No quedan entidades. Fin del juego.");
+            return;
+        }
+
+        if (actual instanceof Jugador) {
+            return;
+        }
 
         IAEnemigo.ejecutar(actual, jugador, habitacionActual, turnoManager, log);
 
         if (!jugador.estaVivo()) {
             gameOver = true;
             log.add("Fin del juego. Has sido derrotado.");
+            return;
         }
 
         turnoManager.finalizarTurno();
+
+        // Después del turno del enemigo, avanzar al siguiente turno
+        iniciarNuevoTurno();
     }
 
     private void intentarCambiarHabitacion() {

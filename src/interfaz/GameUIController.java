@@ -7,6 +7,8 @@ import modelo.*;
 import mundo.HabitacionMock;
 import mundo.Enemigo;
 import listas.*;
+import logica.InicializadorJuego;
+import modelo.Posicion;
 
 public class GameUIController {
 
@@ -15,30 +17,11 @@ public class GameUIController {
     private String modoActual = "NINGUNO";
 
     public GameUIController() {
-        // Jugador
-        Jugador jugador = new Jugador("Jugador", 100, 10, 5,2, new Posicion(1, 1));
+        juego = InicializadorJuego.cargarDesdeJSON("src/partida1.json");
 
-        // Habitación de prueba
-        HabitacionModelo habitacion = new HabitacionMock("sala1", "Sala inicial", 4, 4);
-
-        // Estructuras necesarias para JuegoReal (grafo y lista de habitaciones)
-        Grafo<HabitacionModelo> grafo = new Grafo<>();
-        ListaSimplementeEnlazada<HabitacionModelo> listaHabs = new ListaSimplementeEnlazada<>();
-        grafo.addNodo(habitacion);
-        listaHabs.add(habitacion);
-
-        // Crear JuegoReal con 4 argumentos
-        juego = new JuegoReal(jugador, habitacion, grafo, listaHabs, 25);
-
-        // Enemigo de prueba
-        Enemigo enemigo = new Enemigo("E1", "Goblin", 30, 5, 2, 1,1);
-        enemigo.setPosicion(new Posicion(0, 2));
-        ((HabitacionMock) habitacion).colocarEnemigo(enemigo);
-
-        // Configurar TurnoManager
-        TurnoManager tm = new TurnoManager(jugador, enemigo);
-        juego.setTurnoManager(tm);
-        juego.iniciarNuevoTurno();
+        if (juego == null) {
+            throw new RuntimeException("No se pudo cargar la partida desde JSON.");
+        }
     }
 
     public void setView(GameView view) {
@@ -190,7 +173,10 @@ public class GameUIController {
 
         if (dir != null) {
             boolean ok = juego.attack(dir);
-            view.escribirEvento(ok ? "Ataque realizado hacia " + dir : "No hay enemigo en esa dirección.");
+
+            view.escribirEvento(ok
+                    ? "Ataque realizado hacia " + dir
+                    : "No hay enemigo en esa dirección.");
         } else {
             view.escribirEvento("Solo puedes atacar a una celda adyacente.");
         }

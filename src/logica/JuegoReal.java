@@ -298,15 +298,7 @@ public class JuegoReal implements GameControllerModel {
         if (turnoManager == null || gameOver) return;
         if (esTurnoJugador()) {
             turnoManager.finalizarTurno();
-        }
-        // Ejecutar turnos de enemigos automáticamente hasta que vuelva el jugador
-        while (!gameOver && turnoManager.getEntidadActual() != null && !(turnoManager.getEntidadActual() instanceof Jugador)) {
-            iniciarNuevoTurno();
-            if (gameOver) break;
-            if (turnoManager.getEntidadActual() == null) {
-                turnoManager.iniciarTurno(); // volver a empezar el ciclo
-                break;
-            }
+            iniciarNuevoTurno();   // arranca el siguiente turno (enemigo o jugador)
         }
     }
 

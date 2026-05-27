@@ -17,6 +17,10 @@ public class MainJuego {
         Scanner sc = new Scanner(System.in);
         while (!juego.isGameOver() && !juego.isVictoria()) {
             mostrarEstado(juego);
+            // Mientras no sea el turno del jugador, ejecutar turnos de enemigos automáticamente
+            while (!juego.isGameOver() && !juego.isVictoria() && !juego.esTurnoJugador()) {
+                juego.iniciarNuevoTurno();
+            }
 
             // Si no es el turno del jugador, los enemigos se mueven automáticamente
             if (!juego.esTurnoJugador()) {
@@ -40,7 +44,10 @@ public class MainJuego {
                         default -> null;
                     };
                     if (d != null) {
-                        juego.movePlayer(d);
+                        boolean movido = juego.movePlayer(d);
+                        if (movido) {
+                            juego.finalizarTurnoJugador();   // <-- automático tras mover
+                        }
                     } else {
                         System.out.println("Dirección no válida.");
                     }
@@ -57,18 +64,21 @@ public class MainJuego {
                         default -> null;
                     };
                     if (atkD != null) {
-                        juego.attack(atkD);
+                        boolean atacado = juego.attack(atkD);
+                        if (atacado) {
+                            juego.finalizarTurnoJugador();   // <-- automático tras atacar
+                        }
                     } else {
                         System.out.println("Dirección no válida.");
                     }
                     break;
 
                 case "r":
-                    // Recoge automáticamente en la posición actual del jugador
                     Posicion posJugador = juego.getPlayer().getPosicion();
                     boolean recogido = juego.pickItem(posJugador);
                     if (recogido) {
                         System.out.println("Objeto recogido.");
+                        juego.finalizarTurnoJugador();        // <-- automático tras recoger
                     } else {
                         System.out.println("No hay objeto aquí o no puedes recogerlo.");
                     }
@@ -81,10 +91,13 @@ public class MainJuego {
                     }
                     System.out.print("Índice del objeto a usar: ");
                     int idx = sc.nextInt();
-                    sc.nextLine(); // limpiar buffer
+                    sc.nextLine();
                     if (idx >= 0 && idx < juego.getInventory().getTamaño()) {
                         Objeto obj = juego.getInventory().getDatoEn(idx);
-                        juego.useItem(obj);
+                        boolean usado = juego.useItem(obj);
+                        if (usado) {
+                            juego.finalizarTurnoJugador();    // <-- automático tras usar
+                        }
                     } else {
                         System.out.println("Índice no válido.");
                     }

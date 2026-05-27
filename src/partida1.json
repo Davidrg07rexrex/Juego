@@ -22,7 +22,7 @@
   ],
   "habitaciones": [
     {
-      "id": "sala_inicio", "nombre": "Sala de Inicio", "filas": 6, "columnas": 7, "esSalida": false,
+      "id": "sala_inicio", "nombre": "Sala de Inicio", "filas": 7, "columnas": 6, "esSalida": false,
       "matriz": [
         [{"tipo": "vacia", "fila": 0, "columna": 0, "accesible": true, "contenido": null},
          {"tipo": "vacia", "fila": 0, "columna": 1, "accesible": true, "contenido": null},

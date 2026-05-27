@@ -17,7 +17,7 @@ public class GameUIController {
     private String modoActual = "NINGUNO";
 
     public GameUIController() {
-        juego = InicializadorJuego.cargarDesdeJSON("src/partida1.json");
+        juego = InicializadorJuego.cargarDesdeJSON("src/partida.json");
 
         if (juego == null) {
             throw new RuntimeException("No se pudo cargar la partida desde JSON.");

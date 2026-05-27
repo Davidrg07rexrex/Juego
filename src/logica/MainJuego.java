@@ -8,7 +8,7 @@ public class MainJuego {
 
     public static void main(String[] args) {
         // Carga el juego desde el JSON de configuración
-        JuegoReal juego = InicializadorJuego.cargarDesdeJSON("Juego/src/partida1.json");
+        JuegoReal juego = InicializadorJuego.cargarDesdeJSON("Juego/src/partida.json");
         if (juego == null) {
             System.out.println("No se pudo cargar la partida. Revisa que partida.json esté en la raíz del proyecto.");
             return;

@@ -126,14 +126,6 @@ public class Enemigo extends Entidad {
     }
 
     @Override
-    public int compareTo(Entidad o) {
-        if (o instanceof Enemigo) {
-            return this.id.compareTo(((Enemigo)o).id);
-        }
-        return super.compareTo(o);
-    }
-
-    @Override
     public String toString() {
         return "Enemigo " + nombre + " [V:" + vida + " A:" + ataque + " D:" + defensa + "]";
     }

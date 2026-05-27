@@ -9,8 +9,8 @@ public class PruebaIntegracion {
     public static void main(String[] args) {
         System.out.println("=== PRUEBA DE INTEGRACIÓN DEL SISTEMA DE JUEGO ===\n");
 
-        // 1. Crear habitación de prueba
-        HabitacionMock hab = new HabitacionMock("Mazmorra", 5, 5);
+        // 1. Crear habitación de prueba (ahora con id)
+        HabitacionMock hab = new HabitacionMock("mazmorra", "Mazmorra", 5, 5);
 
         // 2. Crear jugador en posición (2,2)
         Jugador jugador = new Jugador("Héroe", 100, 15, 5, new Posicion(2, 2));
@@ -21,21 +21,26 @@ public class PruebaIntegracion {
         Enemigo orco = new Enemigo("e2", "Orco", 50, 12, 4, 1);
         orco.setPosicion(new Posicion(0, 0));
 
-        // Colocar enemigos en el mock
         hab.colocarEnemigo(goblin);
         hab.colocarEnemigo(orco);
 
         // 4. Inicializar TurnoManager
         TurnoManager tm = new TurnoManager(jugador, goblin, orco);
 
-        // 5. Crear JuegoReal
-        JuegoReal juego = new JuegoReal(jugador, hab);
+        // 5. Crear Grafo y lista de habitaciones (necesarios para JuegoReal)
+        Grafo<HabitacionModelo> grafo = new Grafo<>();
+        ListaSimplementeEnlazada<HabitacionModelo> listaHabs = new ListaSimplementeEnlazada<>();
+        grafo.addNodo(hab);
+        listaHabs.add(hab);
+
+        // 6. Crear JuegoReal con los cuatro argumentos
+        JuegoReal juego = new JuegoReal(jugador, hab, grafo, listaHabs);
         juego.setTurnoManager(tm);
 
-        // 6. Mostrar estado inicial
+        // 7. Mostrar estado inicial
         imprimirEstado(juego, hab);
 
-        // 7. Simular varios turnos
+        // 8. Simular varios turnos
         for (int i = 0; i < 6 && !juego.isGameOver(); i++) {
             System.out.println("--- Turno " + (i + 1) + " ---");
             juego.iniciarNuevoTurno();
@@ -48,13 +53,13 @@ public class PruebaIntegracion {
                 Posicion posGoblin = goblin.getPosicion();
                 if (posGoblin != null && estanAdyacentes(jugador.getPosicion(), posGoblin)) {
                     System.out.println("(Jugador decide atacar a Goblin)");
-                    juego.attack(posGoblin);
+                    Direction dir = obtenerDireccion(jugador.getPosicion(), posGoblin);
+                    juego.attack(dir);
                 } else {
                     System.out.println("(Jugador no tiene enemigo adyacente, turno sin acción)");
                 }
-                tm.finalizarTurno();  // Finaliza el turno del jugador manualmente
+                tm.finalizarTurno();
             }
-            // Los turnos de enemigos ya se ejecutan automáticamente en iniciarNuevoTurno()
 
             imprimirEstado(juego, hab);
             System.out.println();
@@ -69,6 +74,15 @@ public class PruebaIntegracion {
 
     private static boolean estanAdyacentes(Posicion a, Posicion b) {
         return Math.abs(a.getFila() - b.getFila()) + Math.abs(a.getColumna() - b.getColumna()) == 1;
+    }
+
+    private static Direction obtenerDireccion(Posicion desde, Posicion hacia) {
+        int df = hacia.getFila() - desde.getFila();
+        int dc = hacia.getColumna() - desde.getColumna();
+        if (df < 0) return Direction.UP;
+        if (df > 0) return Direction.DOWN;
+        if (dc < 0) return Direction.LEFT;
+        return Direction.RIGHT;
     }
 
     private static void imprimirEstado(JuegoReal juego, HabitacionMock hab) {

@@ -9,6 +9,7 @@ import mundo.Enemigo;
 import listas.*;
 import logica.InicializadorJuego;
 import modelo.Posicion;
+import mundo.Objeto;
 
 public class GameUIController {
 
@@ -223,11 +224,34 @@ public class GameUIController {
     }
 
     public void usarObjetoSeleccionado() {
-        view.escribirEvento("Selecciona un objeto del inventario para usarlo.");
+        int indice = view.getInventarioList().getSelectionModel().getSelectedIndex();
+
+        if (indice < 0) {
+            view.escribirEvento("Selecciona un objeto del inventario antes de usarlo.");
+            return;
+        }
+
+        Objeto objeto = juego.getInventory().getDatoEn(indice);
+
+        boolean ok = juego.useItem(objeto);
+
+        if (ok) {
+            view.escribirEvento("Has usado: " + objeto);
+        } else {
+            view.escribirEvento("No se puede usar ese objeto.");
+        }
+
+        refrescarVista();
     }
 
     public void cargarPartida() {
-        juego.loadGame("partida.json");
+        juego = InicializadorJuego.cargarDesdeJSON("src/partida.json");
+
+        if (juego == null) {
+            view.escribirEvento("Error al cargar la partida.");
+            return;
+        }
+
         view.escribirEvento("Partida cargada desde partida.json");
         refrescarVista();
     }

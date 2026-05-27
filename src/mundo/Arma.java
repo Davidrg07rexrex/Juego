@@ -7,6 +7,7 @@ public class Arma extends Objeto implements Comparable<Objeto> {
     private String habilidad;
     private int probabilidad;
 
+
     // Constructor: crea un arma con sus atributos basicos
     public Arma(String id, String nombre, int bonusAtaque, int rango, String slot) {
         super(id, nombre, "arma");
@@ -45,5 +46,15 @@ public class Arma extends Objeto implements Comparable<Objeto> {
     @Override
     public String toString() {
         return getDescripcion();
+    }
+
+    private int bonusDefensa;
+
+    public int getBonusDefensa() {
+        return bonusDefensa;
+    }
+
+    public void setBonusDefensa(int bonusDefensa) {
+        this.bonusDefensa = bonusDefensa;
     }
 }

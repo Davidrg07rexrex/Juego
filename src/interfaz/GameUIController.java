@@ -219,8 +219,8 @@ public class GameUIController {
     }
 
     public void guardarPartida() {
-        juego.saveGame("src/partida_guardada.json");
-        view.escribirEvento("Partida guardada en src/partida_guardada.json");
+        juego.saveGame("partida_guardada.json");
+        view.escribirEvento("Partida guardada en partida_guardada.json");
         refrescarVista();
     }
 
@@ -246,15 +246,9 @@ public class GameUIController {
     }
 
     public void cargarPartida() {
-        String ruta = "src/partida_guardada.json";
-        java.io.File f = new java.io.File(ruta);
-        if (!f.exists()) {
-            view.escribirEvento("ERROR: No hay partida guardada (" + ruta + ")");
-            return;
-        }
-        juego.loadGame(ruta);
+        juego.loadGame("partida_guardada.json");
+        view.escribirEvento("Partida cargada desde partida_guardada.json");
         refrescarVista();
-        view.escribirEvento("Partida cargada desde " + ruta);
     }
 
     public void finalizarTurno() {

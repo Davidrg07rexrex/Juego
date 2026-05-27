@@ -3,7 +3,10 @@ package modelo;
 import listas.ListaSimplementeEnlazada;
 import mundo.Objeto;
 
+
 public class Jugador extends Entidad {
+
+    private int bonusDefensa;
 
     private ListaSimplementeEnlazada<Objeto> inventario;
     private ListaSimplementeEnlazada<String> llaves = new ListaSimplementeEnlazada<>();
@@ -38,5 +41,21 @@ public class Jugador extends Entidad {
     }
     public void agregarAlInventario(Objeto obj) {
         inventario.add(obj);
+    }
+
+    public void setDefensa(int defensa) {
+        this.defensa = defensa;
+    }
+
+    public void setVelocidad(int velocidad) {
+        this.velocidad = velocidad;
+    }
+
+    public int getBonusDefensa() {
+        return bonusDefensa;
+    }
+
+    public void setBonusDefensa(int bonusDefensa) {
+        this.bonusDefensa = bonusDefensa;
     }
 }

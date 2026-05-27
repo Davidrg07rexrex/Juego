@@ -58,24 +58,37 @@ public class GameUIController {
     private void pintarHabitacionDePrueba() {
         view.getGridHabitacion().getChildren().clear();
 
+        boolean[][] alcanzables = juego.getCeldasAlcanzables();
+
         for (int fila = 0; fila < juego.getCurrentRoomRows(); fila++) {
             for (int columna = 0; columna < juego.getCurrentRoomCols(); columna++) {
                 String contenido = juego.getCellSymbol(fila, columna);
                 Button celda = new Button(contenido);
+                celda.setStyle("-fx-font-size: 18px; -fx-font-weight: bold;");
                 celda.setMinSize(60, 60);
 
                 // Estilos según contenido
                 switch (contenido) {
                     case "J":
+                        celda.setText("J");
+                        celda.setStyle("-fx-background-color: lightblue; -fx-font-size: 18px; -fx-font-weight: bold;");
+                        break;
+
                     case "P":
-                        celda.setStyle("-fx-background-color: lightblue;");
+                        celda.setText("P");
+                        celda.setStyle("-fx-background-color: lightblue; -fx-font-size: 18px; -fx-font-weight: bold;");
                         break;
+
                     case "E":
-                        celda.setStyle("-fx-background-color: lightcoral;");
+                        celda.setText("E");
+                        celda.setStyle("-fx-background-color: lightcoral; -fx-font-size: 18px; -fx-font-weight: bold;");
                         break;
+
                     case "O":
-                        celda.setStyle("-fx-background-color: khaki;");
+                        celda.setText("O");
+                        celda.setStyle("-fx-background-color: khaki; -fx-font-size: 18px; -fx-font-weight: bold;");
                         break;
+
                     case "D":
                         celda.setStyle("-fx-background-color: lightgreen;");
                         break;
@@ -83,7 +96,14 @@ public class GameUIController {
                         celda.setStyle("-fx-background-color: gray;");
                         break;
                     default:
+                        celda.setText("");
                         celda.setStyle("-fx-background-color: white;");
+                }
+
+                if (alcanzables != null && alcanzables[fila][columna]) {
+                    celda.setStyle("-fx-background-color: lightgreen; -fx-border-color: black;");
+                } else {
+                    celda.setStyle(celda.getStyle() + "-fx-border-color: black;");
                 }
 
                 final int f = fila;
@@ -96,21 +116,40 @@ public class GameUIController {
     }
 
     private void clickEnCelda(int fila, int columna) {
+
         if (modoActual.equals("MOVER")) {
-            moverJugadorHasta(fila, columna);
+
+            boolean ok = juego.movePlayer(new Posicion(fila, columna));
+
+            if (ok) {
+                view.escribirEvento("Jugador movido a (" + fila + "," + columna + ")");
+            } else {
+                view.escribirEvento("Movimiento inválido.");
+            }
+
+            refrescarVista();
+
         } else if (modoActual.equals("ATACAR")) {
+
             atacarHacia(fila, columna);
+
         } else if (modoActual.equals("RECOGER")) {
+
             boolean ok = juego.pickItem(new Posicion(fila, columna));
+
             if (ok) {
                 view.escribirEvento("Objeto recogido en (" + fila + "," + columna + ")");
             } else {
                 view.escribirEvento("No hay objeto para recoger ahí.");
             }
+
             refrescarVista();
+
         } else {
+
             view.escribirEvento("Click en (" + fila + "," + columna + ")");
         }
+
         modoActual = "NINGUNO";
     }
 
@@ -201,6 +240,12 @@ public class GameUIController {
     public void cargarPartida() {
         juego.loadGame("partida.json");
         view.escribirEvento("Partida cargada desde partida.json");
+        refrescarVista();
+    }
+
+    public void finalizarTurno() {
+        juego.finalizarTurnoJugador();
+        view.escribirEvento("Turno finalizado.");
         refrescarVista();
     }
 }

@@ -36,6 +36,8 @@ public class GameView {
 
     private Button cargarButton;
 
+    private Button pasarTurnoButton;
+
     private GameUIController controller;
 
     public GameView(GameUIController controller) {
@@ -49,13 +51,18 @@ public class GameView {
 
         root = new BorderPane();
 
+        Label titulo = new Label("Juego de Mazmorras - MVC");
+        titulo.setStyle("-fx-font-size: 22px; -fx-font-weight: bold;");
+        root.setTop(titulo);
+
         gridHabitacion = new GridPane();
 
         gridHabitacion.setHgap(5);
 
         gridHabitacion.setVgap(5);
 
-        panelDerecho = new VBox(10);
+        panelDerecho = new VBox(15);
+        panelDerecho.setPrefWidth(250);
 
         vidaLabel = new Label("Vida: ");
 
@@ -68,6 +75,7 @@ public class GameView {
         inventarioList = new ListView<>();
 
         inventarioList.setPrefHeight(120);
+        inventarioList.setMaxHeight(120);
 
         moverButton = new Button("Mover");
 
@@ -81,6 +89,8 @@ public class GameView {
 
         cargarButton = new Button("Cargar");
 
+        pasarTurnoButton = new Button("Pasar turno");
+
         moverButton.setOnAction(e -> controller.activarModoMover());
 
         atacarButton.setOnAction(e -> controller.activarModoAtacar());
@@ -92,6 +102,8 @@ public class GameView {
         guardarButton.setOnAction(e -> controller.guardarPartida());
 
         cargarButton.setOnAction(e -> controller.cargarPartida());
+
+        pasarTurnoButton.setOnAction(e -> controller.finalizarTurno());
 
         panelDerecho.getChildren().addAll(
 
@@ -125,7 +137,9 @@ public class GameView {
 
                 guardarButton,
 
-                cargarButton
+                cargarButton,
+
+                pasarTurnoButton
         );
 
         registroEventos = new TextArea();

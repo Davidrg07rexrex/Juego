@@ -189,6 +189,7 @@ public class GameUIController {
         view.setVida(String.valueOf(juego.getPlayer().getVida()));
         view.setAtaque(String.valueOf(juego.getPlayer().getAtaque()));
         view.setDefensa(String.valueOf(juego.getPlayer().getDefensa()));
+        view.setTurnos(String.valueOf(juego.getTurnosRestantes()));
 
         // Refrescar inventario
         view.getInventarioList().getItems().clear();
@@ -218,8 +219,8 @@ public class GameUIController {
     }
 
     public void guardarPartida() {
-        juego.saveGame("partida.json");
-        view.escribirEvento("Partida guardada en partida.json");
+        juego.saveGame("src/partida_guardada.json");
+        view.escribirEvento("Partida guardada en src/partida_guardada.json");
         refrescarVista();
     }
 
@@ -245,15 +246,15 @@ public class GameUIController {
     }
 
     public void cargarPartida() {
-        juego = InicializadorJuego.cargarDesdeJSON("src/partida.json");
-
-        if (juego == null) {
-            view.escribirEvento("Error al cargar la partida.");
+        String ruta = "src/partida_guardada.json";
+        java.io.File f = new java.io.File(ruta);
+        if (!f.exists()) {
+            view.escribirEvento("ERROR: No hay partida guardada (" + ruta + ")");
             return;
         }
-
-        view.escribirEvento("Partida cargada desde partida.json");
+        juego.loadGame(ruta);
         refrescarVista();
+        view.escribirEvento("Partida cargada desde " + ruta);
     }
 
     public void finalizarTurno() {

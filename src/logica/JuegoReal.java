@@ -15,6 +15,7 @@ public class JuegoReal implements GameControllerModel {
     private Jugador jugador;
     private ListaSimplementeEnlazada<String> log;
     private boolean gameOver;
+    private boolean victoria;
 
     public JuegoReal(Jugador jugador, HabitacionModelo inicial,
                      Grafo<HabitacionModelo> grafo,
@@ -25,6 +26,7 @@ public class JuegoReal implements GameControllerModel {
         this.listaHabitaciones = listaHabitaciones;
         this.log = new ListaSimplementeEnlazada<>();
         this.gameOver = false;
+        this.victoria = false;
     }
 
     // ---------- Métodos de GameControllerModel ----------
@@ -105,6 +107,10 @@ public class JuegoReal implements GameControllerModel {
         }
 
         jugador.agregarAlInventario(obj);
+        // Si es una llave, guardarla en el llavero del jugador
+        if (obj.getTipo().equals("llave")) {
+            jugador.agregarLlave(obj.getId());
+        }
         habitacionActual.eliminarObjeto(pos.getFila(), pos.getColumna());
         log.add("Has recogido " + obj.getNombre());
         return true;
@@ -200,7 +206,7 @@ public class JuegoReal implements GameControllerModel {
         Posicion p = jugador.getPosicion();
         String destino = habitacionActual.getDestinoPuerta(p.getFila(), p.getColumna());
         if (destino != null) {
-            // Verificar llave si es necesaria
+            // Verificar llave
             if (habitacionActual.puertaNecesitaLlave(p.getFila(), p.getColumna())) {
                 String idLlave = habitacionActual.getIdLlavePuerta(p.getFila(), p.getColumna());
                 if (!jugador.tieneLlave(idLlave)) {
@@ -210,8 +216,15 @@ public class JuegoReal implements GameControllerModel {
             }
             HabitacionModelo nuevaHab = buscarHabitacionPorId(destino);
             if (nuevaHab != null) {
-                this.habitacionActual = nuevaHab;
+                habitacionActual = nuevaHab;
                 log.add("Atraviesas la puerta hacia " + nuevaHab.getId());
+
+                // VICTORIA
+                if (nuevaHab instanceof Habitacion && ((Habitacion)nuevaHab).esSalida()) {
+                    gameOver = true;
+                    victoria = true;
+                    log.add("¡Has escapado! ¡Victoria!");
+                }
             } else {
                 log.add("La puerta no lleva a ningún sitio.");
             }
@@ -273,10 +286,8 @@ public class JuegoReal implements GameControllerModel {
         }
 
         if (!(actual instanceof Jugador)) {
-            // Si es un enemigo, ejecutar su IA inmediatamente
             ejecutarTurnoIA();
         }
-        // Si es el jugador, esperará acciones del usuario a través de la UI.
     }
 
     public void ejecutarTurnoIA() {
@@ -298,5 +309,33 @@ public class JuegoReal implements GameControllerModel {
     }
     public void setTurnoManager(TurnoManager tm) {
         this.turnoManager = tm;
+    }
+    @Override
+    public boolean esTurnoJugador() {
+        if (turnoManager == null) return false;
+        return turnoManager.getEntidadActual() == jugador;
+    }
+
+    @Override
+    public void finalizarTurnoJugador() {
+        if (turnoManager == null) return;
+        if (turnoManager.getEntidadActual() == jugador) {
+            turnoManager.finalizarTurno();
+        }
+        // Ejecutar turnos de enemigos restantes
+        while (!gameOver && turnoManager.getEntidadActual() != jugador) {
+            iniciarNuevoTurno();
+            if (gameOver) break;
+            if (turnoManager.getEntidadActual() == null) {
+                // No quedan enemigos, vuelve a empezar el jugador
+                turnoManager.iniciarTurno();
+                break;
+            }
+        }
+    }
+
+    @Override
+    public boolean isVictoria() {
+        return victoria;
     }
 }

@@ -17,6 +17,10 @@ public class Jugador extends Entidad {
     public boolean tieneLlave(String idLlave) {
         return llaves.contains(idLlave);
     }
+    public void setVidaMaxima(int vidaMaxima) {
+        this.vidaMaxima = vidaMaxima;
+        if (this.vida > vidaMaxima) this.vida = vidaMaxima;
+    }
 
     public Jugador(String nombre, int vida, int ataque, int defensa, Posicion posicion) {
         super(nombre, vida, ataque, defensa, posicion);

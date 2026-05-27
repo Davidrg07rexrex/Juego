@@ -15,8 +15,8 @@ public interface GameControllerModel {
     boolean isGameOver();
 
     boolean movePlayer(Direction dir);
-    boolean attack(Direction dir);          // Ataque en una dirección
-    boolean attackNearbyEnemy();            // Ataque al primer enemigo adyacente
+    boolean attack(Direction dir);
+    boolean attackNearbyEnemy();
     boolean pickItem(Posicion pos);
     boolean useItem(Objeto item);
 
@@ -26,4 +26,9 @@ public interface GameControllerModel {
     int getCurrentRoomRows();
     int getCurrentRoomCols();
     String getCellSymbol(int row, int col);
+
+    // NUEVOS
+    boolean esTurnoJugador();
+    void finalizarTurnoJugador();
+    boolean isVictoria();
 }

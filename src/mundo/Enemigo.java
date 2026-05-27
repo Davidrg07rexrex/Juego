@@ -10,17 +10,20 @@ import modelo.Posicion;
 public class Enemigo extends Entidad {
     private String id;
     private int danioBase;
+    private int movimiento;
 
     // Constructor: crea un enemigo con sus estadisticas
     public Enemigo(String id, String nombre, int vida, int ataque, int defensa, int movimiento) {
         super(nombre, vida, ataque, defensa, new Posicion(0, 0));
         this.id = id;
         this.danioBase = ataque;
+        this.movimiento = movimiento;
     }
 
     // ----- GETTERS -----
     public String getId() { return id; }
     public int getDanioBase() { return danioBase; }
+    public int getMovimiento(){return movimiento;}
 
     // Calcula el siguiente paso hacia el jugador usando BFS
     public Celda calcularMovimientoHacia(Celda jugadorPos, Celda[][] matriz) {

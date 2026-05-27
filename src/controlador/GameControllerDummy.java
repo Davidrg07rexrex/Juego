@@ -202,4 +202,19 @@ public class GameControllerDummy implements GameControllerModel {
         log.add("No hay enemigo cerca");
         return false;
     }
+    @Override
+    public boolean esTurnoJugador() {
+        return true;  // en el dummy siempre es turno del jugador
+    }
+
+    @Override
+    public void finalizarTurnoJugador() {
+        log.add("Turno finalizado (dummy)");
+        // no hace nada más
+    }
+
+    @Override
+    public boolean isVictoria() {
+        return false;  // dummy no tiene salida
+    }
 }

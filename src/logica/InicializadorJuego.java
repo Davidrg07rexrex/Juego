@@ -94,15 +94,18 @@ public class InicializadorJuego {
         // 9. JuegoReal
         JuegoReal juego = new JuegoReal(jugador, habInicial, grafo, listaHabitaciones, 30);
 
-        // 10. TurnoManager
-        if (todosLosEnemigos.getTamaño() > 0) {
-            Enemigo[] arrayEnemigos = new Enemigo[todosLosEnemigos.getTamaño()];
-            for (int i = 0; i < todosLosEnemigos.getTamaño(); i++) {
-                arrayEnemigos[i] = todosLosEnemigos.getDatoEn(i);
+        // 10. TurnoManager solo con enemigos de la habitación inicial
+        if (habInicial instanceof Habitacion) {
+            ListaSimplementeEnlazada<Enemigo> enemigosIniciales = ((Habitacion) habInicial).getEnemigos();
+            if (enemigosIniciales.getTamaño() > 0) {
+                Enemigo[] arrayEnemigos = new Enemigo[enemigosIniciales.getTamaño()];
+                for (int i = 0; i < enemigosIniciales.getTamaño(); i++) {
+                    arrayEnemigos[i] = enemigosIniciales.getDatoEn(i);
+                }
+                TurnoManager tm = new TurnoManager(jugador, arrayEnemigos);
+                juego.setTurnoManager(tm);
+                juego.iniciarNuevoTurno();
             }
-            TurnoManager tm = new TurnoManager(jugador, arrayEnemigos);
-            juego.setTurnoManager(tm);
-            juego.iniciarNuevoTurno();
         }
 
         return juego;

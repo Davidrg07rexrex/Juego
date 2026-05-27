@@ -122,9 +122,8 @@ public class JuegoReal implements GameControllerModel {
 
         Posicion objetivo = jugador.getPosicion().mover(dir);
         if (objetivo.getFila() < 0 || objetivo.getFila() >= getCurrentRoomRows()
-                || objetivo.getColumna() < 0 || objetivo.getColumna() >= getCurrentRoomCols()
-                || !habitacionActual.esTransitable(objetivo.getFila(), objetivo.getColumna())) {
-            log.add("No puedes atacar en esa dirección.");
+                || objetivo.getColumna() < 0 || objetivo.getColumna() >= getCurrentRoomCols()) {
+            log.add("No puedes atacar fuera del mapa.");
             return false;
         }
 
@@ -330,6 +329,7 @@ public class JuegoReal implements GameControllerModel {
         Posicion p = jugador.getPosicion();
         String destino = habitacionActual.getDestinoPuerta(p.getFila(), p.getColumna());
         if (destino != null) {
+            // Verificar llave
             if (habitacionActual.puertaNecesitaLlave(p.getFila(), p.getColumna())) {
                 String idLlave = habitacionActual.getIdLlavePuerta(p.getFila(), p.getColumna());
                 if (!jugador.tieneLlave(idLlave)) {
@@ -339,8 +339,10 @@ public class JuegoReal implements GameControllerModel {
             }
             HabitacionModelo nuevaHab = buscarHabitacionPorId(destino);
             if (nuevaHab != null) {
-                habitacionActual = nuevaHab;
+                this.habitacionActual = nuevaHab;
+                reconfigurarTurnos();                    // ← AÑADIR ESTA LÍNEA
                 log.add("Atraviesas la puerta hacia " + nuevaHab.getId());
+
                 if (nuevaHab instanceof Habitacion && ((Habitacion)nuevaHab).esSalida()) {
                     gameOver = true;
                     victoria = true;
@@ -352,15 +354,28 @@ public class JuegoReal implements GameControllerModel {
         }
     }
 
-    private HabitacionModelo buscarHabitacionPorId(String id) {
-        for (int i = 0; i < listaHabitaciones.getTamaño(); i++) {
-            HabitacionModelo hab = listaHabitaciones.getDatoEn(i);
-            if (hab.getId().equals(id)) return hab;
-        }
-        return null;
-    }
-
     public void setTurnoManager(TurnoManager tm) { this.turnoManager = tm; }
 
     public int getTurnosRestantes() { return turnosRestantes; }
+    private void reconfigurarTurnos() {
+        if (habitacionActual instanceof Habitacion) {
+            ListaSimplementeEnlazada<Enemigo> enemigosHab = ((Habitacion) habitacionActual).getEnemigos();
+            Enemigo[] array = new Enemigo[enemigosHab.getTamaño()];
+            for (int i = 0; i < enemigosHab.getTamaño(); i++) {
+                array[i] = enemigosHab.getDatoEn(i);
+            }
+            TurnoManager nuevoTM = new TurnoManager(jugador, array);
+            setTurnoManager(nuevoTM);
+            nuevoTM.iniciarTurno();  // empieza el turno del jugador en la nueva sala
+        }
+    }
+    private HabitacionModelo buscarHabitacionPorId(String id) {
+        for (int i = 0; i < listaHabitaciones.getTamaño(); i++) {
+            HabitacionModelo hab = listaHabitaciones.getDatoEn(i);
+            if (hab.getId().equals(id)) {
+                return hab;
+            }
+        }
+        return null;
+    }
 }

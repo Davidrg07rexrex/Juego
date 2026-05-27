@@ -289,9 +289,33 @@ public class Habitacion implements HabitacionModelo {
                         }
                     }
                 } else if (tipo.equals("puerta")) {
-                    // ... (código de puerta)
+                    if (dato.contenido instanceof Map) {
+                        Map<String, Object> datosPuerta = (Map<String, Object>) dato.contenido;
+                        String destino = (String) datosPuerta.get("destino");
+                        Celda celda = getCelda(fila, columna);
+                        if (destino != null && celda != null) {
+                            Boolean necesitaLlave = (Boolean) datosPuerta.get("necesitaLlave");
+                            if (necesitaLlave != null && necesitaLlave) {
+                                String idLlave = (String) datosPuerta.get("idLlave");
+                                Puerta puerta = new Puerta(destino, idLlave, celda);
+                                colocarPuerta(fila, columna, puerta);
+                            } else {
+                                Puerta puerta = new Puerta(destino, celda);
+                                colocarPuerta(fila, columna, puerta);
+                            }
+                        }
+                    }
                 } else if (tipo.equals("trampa")) {
-                    // ... (código de trampa)
+                    if (dato.contenido instanceof Map) {
+                        Map<String, Object> mapTrampa = (Map<String, Object>) dato.contenido;
+                        Object valDanio = mapTrampa.get("danio");
+                        int danio = 0;
+                        if (valDanio instanceof Number) {
+                            danio = ((Number) valDanio).intValue();
+                        }
+                        Trampa trampa = new Trampa(danio);
+                        colocarTrampa(fila, columna, trampa);
+                    }
                 }
             }
         }
@@ -313,5 +337,20 @@ public class Habitacion implements HabitacionModelo {
             if (e.getId().equals(id)) return e;
         }
         return null;
+    }
+    public ListaSimplementeEnlazada<Enemigo> getEnemigos() {
+        ListaSimplementeEnlazada<Enemigo> lista = new ListaSimplementeEnlazada<>();
+        for (int i = 0; i < filas; i++) {
+            for (int j = 0; j < columnas; j++) {
+                Celda celda = matriz[i][j];
+                if (celda.getTipo().equals("enemigo") && celda.getContenido() instanceof Enemigo) {
+                    Enemigo e = (Enemigo) celda.getContenido();
+                    if (e.estaVivo()) {
+                        lista.add(e);
+                    }
+                }
+            }
+        }
+        return lista;
     }
 }

@@ -8,18 +8,23 @@ import mundo.*;
 
 public class JuegoReal implements GameControllerModel {
 
+    private Grafo<HabitacionModelo> grafo;
+    private ListaSimplementeEnlazada<HabitacionModelo> listaHabitaciones; // en lugar de Map
     private TurnoManager turnoManager;
     private HabitacionModelo habitacionActual;   // la implementación real de Persona 2
     private Jugador jugador;
     private ListaSimplementeEnlazada<String> log;
     private boolean gameOver;
 
-    public JuegoReal(Jugador jugador, HabitacionModelo inicial) {
+    public JuegoReal(Jugador jugador, HabitacionModelo inicial,
+                     Grafo<HabitacionModelo> grafo,
+                     ListaSimplementeEnlazada<HabitacionModelo> listaHabitaciones) {
         this.jugador = jugador;
         this.habitacionActual = inicial;
+        this.grafo = grafo;
+        this.listaHabitaciones = listaHabitaciones;
         this.log = new ListaSimplementeEnlazada<>();
         this.gameOver = false;
-        // turnoManager se inicializará cuando Persona 2 entregue la lista de enemigos
     }
 
     // ---------- Métodos de GameControllerModel ----------
@@ -61,17 +66,22 @@ public class JuegoReal implements GameControllerModel {
 
             jugador.setPosicion(nueva);
             log.add("Movido a " + nueva);
+
+            // Daño por trampa
+            if (habitacionActual.esTrampa(nueva.getFila(), nueva.getColumna())) {
+                int danio = habitacionActual.getDanioTrampa(nueva.getFila(), nueva.getColumna());
+                jugador.recibirDanio(danio);
+                log.add("¡Has caído en una trampa! Recibes " + danio + " de daño.");
+                if (!jugador.estaVivo()) {
+                    gameOver = true;
+                    log.add("Has muerto por una trampa.");
+                }
+            }
+
+            intentarCambiarHabitacion();   // <--- CAMBIO DE SALA
             return true;
         }
         log.add("Movimiento inválido hacia " + dir);
-        return false;
-    }
-
-    @Override
-    public boolean attack(Posicion pos) {
-        // TODO: validar adyacencia, obtener enemigo en esa posición,
-        // ejecutar fórmula de combate, actualizar vida, eliminar si muere.
-        log.add("Ataque en " + pos + " (no implementado aún)");
         return false;
     }
 
@@ -176,6 +186,78 @@ public class JuegoReal implements GameControllerModel {
         }
         // El resto de la consulta se delega en Habitacion (Persona 2)
         return habitacionActual.getSimbolo(row, col); // Persona 2 debe crear este método
+    }
+    private HabitacionModelo buscarHabitacionPorId(String id) {
+        for (int i = 0; i < listaHabitaciones.getTamaño(); i++) {
+            HabitacionModelo hab = listaHabitaciones.getDatoEn(i);
+            if (hab.getId().equals(id)) {
+                return hab;
+            }
+        }
+        return null;
+    }
+    private void intentarCambiarHabitacion() {
+        Posicion p = jugador.getPosicion();
+        String destino = habitacionActual.getDestinoPuerta(p.getFila(), p.getColumna());
+        if (destino != null) {
+            // Verificar llave si es necesaria
+            if (habitacionActual.puertaNecesitaLlave(p.getFila(), p.getColumna())) {
+                String idLlave = habitacionActual.getIdLlavePuerta(p.getFila(), p.getColumna());
+                if (!jugador.tieneLlave(idLlave)) {
+                    log.add("La puerta necesita la llave: " + idLlave);
+                    return;
+                }
+            }
+            HabitacionModelo nuevaHab = buscarHabitacionPorId(destino);
+            if (nuevaHab != null) {
+                this.habitacionActual = nuevaHab;
+                log.add("Atraviesas la puerta hacia " + nuevaHab.getId());
+            } else {
+                log.add("La puerta no lleva a ningún sitio.");
+            }
+        }
+    }
+
+    @Override
+    public boolean attack(Direction dir) {
+        if (gameOver || turnoManager == null) return false;
+        if (turnoManager.getEntidadActual() != jugador) return false;
+
+        Posicion objetivo = jugador.getPosicion().mover(dir);
+        if (objetivo.getFila() < 0 || objetivo.getFila() >= getCurrentRoomRows()
+                || objetivo.getColumna() < 0 || objetivo.getColumna() >= getCurrentRoomCols()
+                || !habitacionActual.esTransitable(objetivo.getFila(), objetivo.getColumna())) {
+            log.add("No puedes atacar en esa dirección.");
+            return false;
+        }
+
+        Entidad defensor = habitacionActual.getEnemigoEn(objetivo.getFila(), objetivo.getColumna());
+        if (defensor == null) {
+            log.add("No hay enemigo en esa dirección.");
+            return false;
+        }
+
+        boolean muerto = Combate.resolver(jugador, defensor);
+        log.add("Atacas a " + defensor.getNombre() + " causando "
+                + (muerto ? "la muerte" : "daño")
+                + " (vida restante: " + defensor.getVida() + ")");
+
+        if (muerto) {
+            habitacionActual.eliminarEnemigo(objetivo.getFila(), objetivo.getColumna());
+            turnoManager.eliminarEntidad(defensor);
+            log.add(defensor.getNombre() + " ha muerto");
+        }
+        return true;
+    }
+
+    @Override
+    public boolean attackNearbyEnemy() {
+        if (attack(Direction.UP)) return true;
+        if (attack(Direction.DOWN)) return true;
+        if (attack(Direction.LEFT)) return true;
+        if (attack(Direction.RIGHT)) return true;
+        log.add("No hay enemigo cerca");
+        return false;
     }
 
     // ---------- Métodos internos ----------

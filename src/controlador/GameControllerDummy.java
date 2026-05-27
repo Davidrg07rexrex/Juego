@@ -22,15 +22,31 @@ public class GameControllerDummy implements GameControllerModel {
     public GameControllerDummy() {
         log = new ListaSimplementeEnlazada<>();
         inventario = new ListaSimplementeEnlazada<>();
-        habitacion = new Habitacion("Sala de pruebas",filas,columnas);
+        habitacion = new Habitacion("sala_pruebas", "Sala de pruebas", filas, columnas);
 
         log.add("Juego iniciado (modo dummy)");
 
         // Añadir objetos de prueba al inventario
-        inventario.add(new Objeto("poc1", "Poción", "pocion"));
-        inventario.add(new Objeto("esp1", "Espada", "arma"));
+        inventario.add(new ObjetoDummy("poc1", "Poción", "pocion"));
+        inventario.add(new ObjetoDummy("esp1", "Espada", "arma"));
 
         inicializarMapa();
+    }
+    // Clase auxiliar para poder crear objetos concretos en el Dummy
+    private static class ObjetoDummy extends Objeto {
+        public ObjetoDummy(String id, String nombre, String tipo) {
+            super(id, nombre, tipo);
+        }
+
+        @Override
+        public String getDescripcion() {
+            return nombre;
+        }
+
+        @Override
+        public String toString() {
+            return getDescripcion();
+        }
     }
 
     private void inicializarMapa() {
@@ -102,22 +118,31 @@ public class GameControllerDummy implements GameControllerModel {
     }
 
     @Override
-    public boolean attack(Posicion pos) {
+    public boolean attack(Direction dir) {
+        // Calcular la casilla adyacente
+        int fila = jugadorFila;
+        int col = jugadorCol;
+        switch (dir) {
+            case UP:    fila--; break;
+            case DOWN:  fila++; break;
+            case LEFT:  col--; break;
+            case RIGHT: col++; break;
+            default: return false;
+        }
+        return attackAt(new Posicion(fila, col));  // método privado que simula el ataque
+    }
+
+    // Método privado auxiliar (el viejo attack por posición, ahora privado)
+    private boolean attackAt(Posicion pos) {
         int fila = pos.getFila();
         int col = pos.getColumna();
-
-        if (fila < 0 || fila >= filas || col < 0 || col >= columnas) {
-            return false;
-        }
-
+        if (fila < 0 || fila >= filas || col < 0 || col >= columnas) return false;
         log.add("Atacar en " + pos);
-
         if (mapa[fila][col].equals("E")) {
             mapa[fila][col] = "·";
             log.add("Enemigo eliminado");
             return true;
         }
-
         return false;
     }
 
@@ -128,7 +153,7 @@ public class GameControllerDummy implements GameControllerModel {
             mapa[pos.getFila()][pos.getColumna()] = "·";
             log.add("Objeto recogido");
             // Añadir a inventario (simulado)
-            inventario.add(new Objeto("recogido1", "Objeto recogido", "misc"));
+            inventario.add(new ObjetoDummy("recogido1", "Objeto recogido", "misc"));
             return true;
         }
         return false;
@@ -168,15 +193,12 @@ public class GameControllerDummy implements GameControllerModel {
         return "?";
     }
 
+    @Override
     public boolean attackNearbyEnemy() {
-        int fila = jugadorFila;
-        int col = jugadorCol;
-
-        if (attack(new Posicion(fila - 1, col))) return true; // arriba
-        if (attack(new Posicion(fila + 1, col))) return true; // abajo
-        if (attack(new Posicion(fila, col - 1))) return true; // izquierda
-        if (attack(new Posicion(fila, col + 1))) return true; // derecha
-
+        if (attack(Direction.UP)) return true;
+        if (attack(Direction.DOWN)) return true;
+        if (attack(Direction.LEFT)) return true;
+        if (attack(Direction.RIGHT)) return true;
         log.add("No hay enemigo cerca");
         return false;
     }

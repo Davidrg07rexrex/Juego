@@ -6,6 +6,17 @@ import mundo.Objeto;
 public class Jugador extends Entidad {
 
     private ListaSimplementeEnlazada<Objeto> inventario;
+    private ListaSimplementeEnlazada<String> llaves = new ListaSimplementeEnlazada<>();
+
+    public void agregarLlave(String idLlave) {
+        if (!llaves.contains(idLlave)) {
+            llaves.add(idLlave);
+        }
+    }
+
+    public boolean tieneLlave(String idLlave) {
+        return llaves.contains(idLlave);
+    }
 
     public Jugador(String nombre, int vida, int ataque, int defensa, Posicion posicion) {
         super(nombre, vida, ataque, defensa, posicion);

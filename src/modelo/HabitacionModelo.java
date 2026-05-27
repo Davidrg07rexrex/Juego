@@ -3,6 +3,7 @@ package modelo;
 import mundo.Objeto;
 
 public interface HabitacionModelo extends Comparable<HabitacionModelo> {
+    String getId();
     int getFilas();
     int getColumnas();
     boolean esTransitable(int fila, int columna);
@@ -12,7 +13,6 @@ public interface HabitacionModelo extends Comparable<HabitacionModelo> {
     void eliminarObjeto(int fila, int columna);
     void moverEnemigo(Entidad enemigo, int nuevaFila, int nuevaColumna);
     Objeto getObjetoEn(int fila, int columna);
-    String getId();
     String getDestinoPuerta(int fila, int columna);
     boolean puertaNecesitaLlave(int fila, int columna);
     String getIdLlavePuerta(int fila, int columna);

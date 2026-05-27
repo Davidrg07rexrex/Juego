@@ -6,13 +6,15 @@ import modelo.Posicion;
 import listas.ListaSimplementeEnlazada;
 
 public class HabitacionMock implements HabitacionModelo {
+    private String id;
     private String nombre;
     private int filas;
     private int columnas;
     private ListaSimplementeEnlazada<Enemigo> enemigos;
     private Objeto[][] matrizObjetos;
 
-    public HabitacionMock(String nombre, int filas, int columnas) {
+    public HabitacionMock(String id, String nombre, int filas, int columnas) {
+        this.id=id;
         this.nombre = nombre;
         this.filas = filas;
         this.columnas = columnas;

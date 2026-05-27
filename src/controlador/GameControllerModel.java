@@ -1,12 +1,11 @@
 package controlador;
 
-import modelo.HabitacionModelo;
 import modelo.Direction;
 import modelo.Jugador;
-import modelo.Posicion;                       // ← desde modelo
-import mundo.Habitacion;
+import modelo.HabitacionModelo;
+import modelo.Posicion;
 import mundo.Objeto;
-import listas.ListaSimplementeEnlazada;      // tu estructura propia
+import listas.ListaSimplementeEnlazada;
 
 public interface GameControllerModel {
     HabitacionModelo getCurrentRoom();
@@ -16,7 +15,8 @@ public interface GameControllerModel {
     boolean isGameOver();
 
     boolean movePlayer(Direction dir);
-    boolean attack(Posicion pos);
+    boolean attack(Direction dir);          // Ataque en una dirección
+    boolean attackNearbyEnemy();            // Ataque al primer enemigo adyacente
     boolean pickItem(Posicion pos);
     boolean useItem(Objeto item);
 

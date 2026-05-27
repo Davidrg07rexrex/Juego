@@ -13,12 +13,12 @@ public class PruebaIntegracion {
         HabitacionMock hab = new HabitacionMock("mazmorra", "Mazmorra", 5, 5);
 
         // 2. Crear jugador en posición (2,2)
-        Jugador jugador = new Jugador("Héroe", 100, 15, 5, new Posicion(2, 2));
+        Jugador jugador = new Jugador("Héroe", 100, 15, 5, 1,new Posicion(2, 2));
 
         // 3. Crear enemigos
-        Enemigo goblin = new Enemigo("e1", "Goblin", 30, 10, 2, 1);
+        Enemigo goblin = new Enemigo("e1", "Goblin", 30, 10, 2, 1,1);
         goblin.setPosicion(new Posicion(2, 3));  // adyacente al jugador
-        Enemigo orco = new Enemigo("e2", "Orco", 50, 12, 4, 1);
+        Enemigo orco = new Enemigo("e2", "Orco", 50, 12, 4, 1,1);
         orco.setPosicion(new Posicion(0, 0));
 
         hab.colocarEnemigo(goblin);
@@ -34,7 +34,7 @@ public class PruebaIntegracion {
         listaHabs.add(hab);
 
         // 6. Crear JuegoReal con los cuatro argumentos
-        JuegoReal juego = new JuegoReal(jugador, hab, grafo, listaHabs);
+        JuegoReal juego = new JuegoReal(jugador, hab, grafo, listaHabs, 20);
         juego.setTurnoManager(tm);
 
         // 7. Mostrar estado inicial

@@ -25,7 +25,7 @@ public class InicializadorJuego {
         // 2. Lista de plantillas de enemigos
         ListaSimplementeEnlazada<Enemigo> plantillasEnemigos = new ListaSimplementeEnlazada<>();
         for (DatosEnemigoPlantilla dep : datos.enemigosDisponibles) {
-            Enemigo enemigo = new Enemigo(dep.id, dep.nombre, dep.vida, dep.ataque, dep.defensa, dep.movimiento);
+            Enemigo enemigo = new Enemigo(dep.id, dep.nombre, dep.vida, dep.ataque, dep.defensa, 1, dep.movimiento);
             plantillasEnemigos.add(enemigo);
         }
 
@@ -47,7 +47,7 @@ public class InicializadorJuego {
             Enemigo plantilla = buscarEnemigoPorId(plantillasEnemigos, ei.id);
             if (plantilla != null) {
                 Enemigo instancia = new Enemigo(plantilla.getId(), plantilla.getNombre(),
-                        plantilla.getVida(), plantilla.getAtaque(), plantilla.getDefensa(),
+                        plantilla.getVida(), plantilla.getAtaque(), plantilla.getDefensa(),1,
                         plantilla.getMovimiento());
                 instancia.setPosicion(new Posicion(ei.posicion.fila, ei.posicion.columna));
                 // Buscar habitación por id
@@ -74,7 +74,7 @@ public class InicializadorJuego {
 
         // 6. Jugador
         Jugador jugador = new Jugador(datos.jugador.nombre, datos.jugador.vida, datos.jugador.ataque,
-                datos.jugador.defensa, new Posicion(datos.partida.fila, datos.partida.columna));
+                datos.jugador.defensa,datos.jugador.velocidad ,new Posicion(datos.partida.fila, datos.partida.columna));
         jugador.setVidaMaxima(datos.jugador.vidaMaxima);
 
         // 7. Inventario inicial y llaves
@@ -92,7 +92,7 @@ public class InicializadorJuego {
         HabitacionModelo habInicial = buscarHabitacionPorId(listaHabitaciones, datos.partida.habitacionActual);
 
         // 9. JuegoReal
-        JuegoReal juego = new JuegoReal(jugador, habInicial, grafo, listaHabitaciones);
+        JuegoReal juego = new JuegoReal(jugador, habInicial, grafo, listaHabitaciones, 30);
 
         // 10. TurnoManager
         if (todosLosEnemigos.getTamaño() > 0) {

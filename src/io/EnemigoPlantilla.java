@@ -40,7 +40,7 @@ public class EnemigoPlantilla implements Comparable<EnemigoPlantilla> {
      * Crea una nueva instancia de Enemigo con los valores de esta plantilla
      */
     public Enemigo crearEnemigo() {
-        return new Enemigo(id, nombre, vida, ataque, defensa, movimiento);
+        return new Enemigo(id, nombre, vida, ataque, defensa, 1, movimiento);
     }
 
     @Override

@@ -13,8 +13,8 @@ public class Enemigo extends Entidad {
     private int movimiento;
 
     // Constructor: crea un enemigo con sus estadisticas
-    public Enemigo(String id, String nombre, int vida, int ataque, int defensa, int movimiento) {
-        super(nombre, vida, ataque, defensa, new Posicion(0, 0));
+    public Enemigo(String id, String nombre, int vida, int ataque, int defensa, int velocidad, int movimiento) {
+        super(nombre, vida, ataque, defensa, velocidad,new Posicion(0, 0));
         this.id = id;
         this.danioBase = ataque;
         this.movimiento = movimiento;

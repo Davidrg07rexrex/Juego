@@ -7,14 +7,20 @@ public abstract class Entidad {
     protected int ataque;
     protected int defensa;
     protected Posicion posicion;
+    protected int velocidad;
 
-    public Entidad(String nombre, int vida, int ataque, int defensa, Posicion posicion) {
+    public Entidad(String nombre, int vida, int ataque, int defensa, int velocidad, Posicion posicion) {
         this.nombre = nombre;
         this.vidaMaxima = vida;        // al nacer, vida máxima = vida inicial
         this.vida = vida;
         this.ataque = ataque;
         this.defensa = defensa;
         this.posicion = posicion;
+        this.velocidad = velocidad;
+    }
+
+    public int getVelocidad() {
+        return velocidad;
     }
 
     public String getNombre() { return nombre; }

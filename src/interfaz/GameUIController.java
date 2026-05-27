@@ -16,7 +16,7 @@ public class GameUIController {
 
     public GameUIController() {
         // Jugador
-        Jugador jugador = new Jugador("Jugador", 100, 10, 5, new Posicion(1, 1));
+        Jugador jugador = new Jugador("Jugador", 100, 10, 5,2, new Posicion(1, 1));
 
         // Habitación de prueba
         HabitacionModelo habitacion = new HabitacionMock("sala1", "Sala inicial", 4, 4);
@@ -28,10 +28,10 @@ public class GameUIController {
         listaHabs.add(habitacion);
 
         // Crear JuegoReal con 4 argumentos
-        juego = new JuegoReal(jugador, habitacion, grafo, listaHabs);
+        juego = new JuegoReal(jugador, habitacion, grafo, listaHabs, 25);
 
         // Enemigo de prueba
-        Enemigo enemigo = new Enemigo("E1", "Goblin", 30, 5, 2, 1);
+        Enemigo enemigo = new Enemigo("E1", "Goblin", 30, 5, 2, 1,1);
         enemigo.setPosicion(new Posicion(0, 2));
         ((HabitacionMock) habitacion).colocarEnemigo(enemigo);
 

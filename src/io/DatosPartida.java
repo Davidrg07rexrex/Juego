@@ -16,6 +16,7 @@ public class DatosPartida {
         public int vidaMaxima;
         public int ataque;
         public int defensa;
+        public int velocidad;
         public int movimiento;
 
         // Necesario para Gson
@@ -140,6 +141,7 @@ public class DatosPartida {
         public int vida;
         public int ataque;
         public int defensa;
+        public int velocidad;
         public int movimiento;
 
         // Necesario para Gson

@@ -2,6 +2,7 @@ package logica;
 
 import modelo.*;
 import listas.ListaSimplementeEnlazada;
+import logica.Combate;
 
 public class IAEnemigo {
 
@@ -22,13 +23,11 @@ public class IAEnemigo {
 
         // Si está adyacente (distancia 1), atacar al jugador
         if (distManhattan == 1) {
-            int daño = calcularDaño(enemigo, jugador);
-            jugador.setVida(jugador.getVida() - daño);
+            boolean muerto = Combate.resolver(enemigo, jugador);
             log.add(enemigo.getNombre() + " ataca a " + jugador.getNombre()
-                    + " causando " + daño + " de daño (vida restante: " + jugador.getVida() + ")");
-            if (!jugador.estaVivo()) {
+                    + " (vida restante: " + jugador.getVida() + ")");
+            if (muerto) {
                 log.add("Has muerto... Fin del juego.");
-                // gameOver se pondrá en JuegoReal
             }
             return;
         }
@@ -78,11 +77,5 @@ public class IAEnemigo {
 
         // Si no puede moverse en ninguna dirección, se queda quieto
         log.add(enemigo.getNombre() + " no puede moverse y se queda quieto.");
-    }
-
-    private static int calcularDaño(Entidad atacante, Entidad defensor) {
-        int tirada = (int)(Math.random() * 6) + 1;
-        int daño = atacante.getAtaque() - defensor.getDefensa() + tirada;
-        return Math.max(1, daño);
     }
 }

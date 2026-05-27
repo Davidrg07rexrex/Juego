@@ -31,4 +31,6 @@ public interface GameControllerModel {
     boolean esTurnoJugador();
     void finalizarTurnoJugador();
     boolean isVictoria();
+    boolean[][] getCeldasAlcanzables();  // para que la vista las ilumine
+    boolean movePlayer(Posicion destino); // moverse a una celda alcanzable
 }

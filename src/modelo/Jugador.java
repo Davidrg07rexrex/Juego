@@ -22,8 +22,8 @@ public class Jugador extends Entidad {
         if (this.vida > vidaMaxima) this.vida = vidaMaxima;
     }
 
-    public Jugador(String nombre, int vida, int ataque, int defensa, Posicion posicion) {
-        super(nombre, vida, ataque, defensa, posicion);
+    public Jugador(String nombre, int vida, int ataque, int defensa, int velocidad, Posicion posicion) {
+        super(nombre, vida, ataque, defensa, velocidad, posicion);
         this.inventario = new ListaSimplementeEnlazada<>();
     }
 

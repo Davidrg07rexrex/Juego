@@ -1,9 +1,16 @@
 package logica;
 
 import controlador.GameControllerModel;
+import io.DatosPartida;
+import io.DatosPartida.*;
 import modelo.*;
 import listas.*;
 import mundo.*;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 
 public class JuegoReal implements GameControllerModel {
 
@@ -21,6 +28,9 @@ public class JuegoReal implements GameControllerModel {
     // Grafo y lista de habitaciones (para cambio de sala)
     private Grafo<HabitacionModelo> grafo;
     private ListaSimplementeEnlazada<HabitacionModelo> listaHabitaciones;
+
+    // Seguimiento de objetos recogidos del suelo (para guardado)
+    private java.util.ArrayList<String> objetosRecogidos = new java.util.ArrayList<>();
 
     public JuegoReal(Jugador jugador, HabitacionModelo inicial,
                      Grafo<HabitacionModelo> grafo,
@@ -177,6 +187,7 @@ public class JuegoReal implements GameControllerModel {
 
         jugador.agregarAlInventario(obj);
         habitacionActual.eliminarObjeto(pos.getFila(), pos.getColumna());
+        objetosRecogidos.add(habitacionActual.getId() + ":" + pos.getFila() + ":" + pos.getColumna());
         log.add("Has recogido " + obj.getNombre());
 
         // Si es una llave, guardarla en el llavero
@@ -235,14 +246,264 @@ public class JuegoReal implements GameControllerModel {
         return true;
     }
 
+    // ---------- SAVE / LOAD ----------
+    // DTO para guardar el estado completo
+    public static class DatosGuardado {
+        public DatosJugador jugador;
+        public DatosPartidaInfo partida;
+        public DatosObjeto[] inventario;
+        public DatosEquipamiento equipamiento;
+        public DatosEnemigoInfo[] enemigos;
+        public String[] celdasVacias;
+    }
+
     @Override
     public void saveGame(String file) {
-        log.add("Guardar partida en " + file + " (pendiente)");
+        try {
+            DatosGuardado dg = new DatosGuardado();
+
+            dg.jugador = new DatosJugador();
+            dg.jugador.nombre = jugador.getNombre();
+            dg.jugador.vida = jugador.getVida();
+            dg.jugador.vidaMaxima = jugador.getVidaMaxima();
+            dg.jugador.ataque = jugador.getAtaque();
+            dg.jugador.defensa = jugador.getDefensa();
+            dg.jugador.velocidad = jugador.getVelocidad();
+            dg.jugador.movimiento = jugador.getVelocidad();
+
+            dg.partida = new DatosPartidaInfo();
+            dg.partida.habitacionActual = habitacionActual.getId();
+            dg.partida.fila = jugador.getPosicion().getFila();
+            dg.partida.columna = jugador.getPosicion().getColumna();
+            dg.partida.turnosRestantes = turnosRestantes;
+
+            ListaSimplementeEnlazada<Objeto> inv = jugador.getInventario();
+            dg.inventario = new DatosObjeto[inv.getTamaño()];
+            for (int i = 0; i < inv.getTamaño(); i++) {
+                dg.inventario[i] = objetoToDatos(inv.getDatoEn(i));
+            }
+
+            dg.equipamiento = new DatosEquipamiento();
+
+            dg.celdasVacias = objetosRecogidos.toArray(new String[0]);
+
+            int totalEnemigos = 0;
+            for (int h = 0; h < listaHabitaciones.getTamaño(); h++) {
+                HabitacionModelo habModelo = listaHabitaciones.getDatoEn(h);
+                if (habModelo instanceof Habitacion) {
+                    Habitacion hab = (Habitacion) habModelo;
+                    for (int f = 0; f < hab.getFilas(); f++) {
+                        for (int c = 0; c < hab.getColumnas(); c++) {
+                            if (hab.getCelda(f, c) != null && hab.getCelda(f, c).getTipo().equals("enemigo")
+                                    && hab.getCelda(f, c).getContenido() instanceof Enemigo) {
+                                totalEnemigos++;
+                            }
+                        }
+                    }
+                }
+            }
+            dg.enemigos = new DatosEnemigoInfo[totalEnemigos];
+            int idx = 0;
+            for (int h = 0; h < listaHabitaciones.getTamaño(); h++) {
+                HabitacionModelo habModelo = listaHabitaciones.getDatoEn(h);
+                if (habModelo instanceof Habitacion) {
+                    Habitacion hab = (Habitacion) habModelo;
+                    for (int f = 0; f < hab.getFilas(); f++) {
+                        for (int c = 0; c < hab.getColumnas(); c++) {
+                            Celda celda = hab.getCelda(f, c);
+                            if (celda == null) continue;
+                            if (celda.getTipo().equals("enemigo") && celda.getContenido() instanceof Enemigo) {
+                                Enemigo e = (Enemigo) celda.getContenido();
+                                dg.enemigos[idx] = new DatosEnemigoInfo();
+                                dg.enemigos[idx].id = e.getId();
+                                dg.enemigos[idx].nombre = e.getNombre();
+                                dg.enemigos[idx].vida = e.getVida();
+                                dg.enemigos[idx].ataque = e.getAtaque();
+                                dg.enemigos[idx].defensa = e.getDefensa();
+                                dg.enemigos[idx].movimiento = e.getMovimiento();
+                                dg.enemigos[idx].posicion = new DatosPosicion();
+                                dg.enemigos[idx].posicion.habitacion = hab.getId();
+                                dg.enemigos[idx].posicion.fila = f;
+                                dg.enemigos[idx].posicion.columna = c;
+                                idx++;
+                            }
+                        }
+                    }
+                }
+            }
+
+            Gson gson = new GsonBuilder().setPrettyPrinting().create();
+            try (FileWriter writer = new FileWriter(file)) {
+                gson.toJson(dg, writer);
+            }
+            log.add("Partida guardada en " + file);
+        } catch (Exception e) {
+            log.add("Error al guardar partida: " + e.getMessage());
+            e.printStackTrace();
+        }
     }
 
     @Override
     public void loadGame(String file) {
-        log.add("Cargar partida desde " + file + " (pendiente)");
+        try {
+            java.io.File archivoGuardado = new java.io.File(file);
+            if (!archivoGuardado.exists()) {
+                log.add("Error: no existe el archivo de guardado: " + file);
+                return;
+            }
+
+            Gson gson = new Gson();
+            DatosGuardado dg;
+            try (FileReader reader = new FileReader(file)) {
+                dg = gson.fromJson(reader, DatosGuardado.class);
+            }
+            if (dg == null) {
+                log.add("Error: el archivo " + file + " esta vacio o es invalido");
+                return;
+            }
+
+            jugador.setVida(dg.jugador.vida);
+            jugador.setVidaMaxima(dg.jugador.vidaMaxima);
+            jugador.setAtaque(dg.jugador.ataque);
+            jugador.setDefensa(dg.jugador.defensa);
+            jugador.setVelocidad(dg.jugador.velocidad);
+
+            Posicion pos = new Posicion(dg.partida.fila, dg.partida.columna);
+            jugador.setPosicion(pos);
+
+            for (int i = 0; i < listaHabitaciones.getTamaño(); i++) {
+                HabitacionModelo hab = listaHabitaciones.getDatoEn(i);
+                if (hab.getId().equals(dg.partida.habitacionActual)) {
+                    this.habitacionActual = hab;
+                    break;
+                }
+            }
+
+            this.turnosRestantes = dg.partida.turnosRestantes;
+
+            if (dg.celdasVacias != null) {
+                for (String s : dg.celdasVacias) {
+                    String[] parts = s.split(":");
+                    if (parts.length == 3) {
+                        for (int h = 0; h < listaHabitaciones.getTamaño(); h++) {
+                            HabitacionModelo hm = listaHabitaciones.getDatoEn(h);
+                            if (hm instanceof Habitacion && hm.getId().equals(parts[0])) {
+                                int f = Integer.parseInt(parts[1]);
+                                int c = Integer.parseInt(parts[2]);
+                                ((Habitacion) hm).eliminarObjeto(f, c);
+                                break;
+                            }
+                        }
+                    }
+                }
+                objetosRecogidos.clear();
+                for (String s : dg.celdasVacias) {
+                    objetosRecogidos.add(s);
+                }
+            }
+
+            ListaSimplementeEnlazada<Objeto> inv = jugador.getInventario();
+            int tamOriginal = inv.getTamaño();
+            for (int i = 0; i < tamOriginal; i++) {
+                inv.remove(inv.getDatoEn(0));
+            }
+            if (dg.inventario != null) {
+                for (DatosObjeto dobj : dg.inventario) {
+                    Objeto obj = crearObjetoDesdeDatos(dobj);
+                    if (obj != null) {
+                        jugador.agregarAlInventario(obj);
+                        if (dobj.tipo != null && dobj.tipo.equals("llave")) {
+                            jugador.agregarLlave(obj.getId());
+                        }
+                    }
+                }
+            }
+
+            if (dg.enemigos != null) {
+                for (DatosEnemigoInfo ei : dg.enemigos) {
+                    for (int h = 0; h < listaHabitaciones.getTamaño(); h++) {
+                        HabitacionModelo habModelo = listaHabitaciones.getDatoEn(h);
+                        if (habModelo instanceof Habitacion && habModelo.getId().equals(ei.posicion.habitacion)) {
+                            Habitacion hab = (Habitacion) habModelo;
+                            Celda celda = hab.getCelda(ei.posicion.fila, ei.posicion.columna);
+                            if (celda != null && celda.getContenido() instanceof Enemigo) {
+                                Enemigo e = (Enemigo) celda.getContenido();
+                                e.setVida(ei.vida);
+                                if (ei.vida <= 0) {
+                                    hab.eliminarEnemigo(ei.posicion.fila, ei.posicion.columna);
+                                }
+                            }
+                            break;
+                        }
+                    }
+                }
+            }
+
+            reconfigurarTurnos();
+
+            Posicion pJug = jugador.getPosicion();
+            celdasAlcanzables = Movimiento.celdasAlcanzables(
+                    habitacionActual,
+                    pJug.getFila(),
+                    pJug.getColumna(),
+                    jugador.getVelocidad()
+            );
+
+            gameOver = false;
+            victoria = false;
+
+            log.add("Partida cargada desde " + file);
+        } catch (Exception e) {
+            log.add("Error al cargar partida: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    private DatosObjeto objetoToDatos(Objeto obj) {
+        DatosObjeto d = new DatosObjeto();
+        d.id = obj.getId();
+        d.nombre = obj.getNombre();
+        d.tipo = obj.getTipo();
+        if (obj instanceof Arma) {
+            Arma a = (Arma) obj;
+            d.bonusAtaque = a.getBonusAtaque();
+            d.bonusDefensa = a.getBonusDefensa();
+            d.rango = a.getRango();
+            d.slot = a.getSlot();
+            d.habilidad = a.getHabilidad();
+            d.probabilidad = a.getProbabilidad();
+            d.equipable = true;
+        } else if (obj instanceof Pocion) {
+            Pocion p = (Pocion) obj;
+            d.bonusVida = p.getBonusVida();
+            d.equipable = false;
+            d.usosMaximos = 1;
+            d.usosRestantes = 1;
+        }
+        return d;
+    }
+
+    private Objeto crearObjetoDesdeDatos(DatosObjeto dobj) {
+        if (dobj == null || dobj.tipo == null) return null;
+        switch (dobj.tipo) {
+            case "arma":
+                Arma arma = new Arma(dobj.id, dobj.nombre, dobj.bonusAtaque, dobj.rango, dobj.slot);
+                if (dobj.habilidad != null) arma.setHabilidad(dobj.habilidad);
+                if (dobj.probabilidad > 0) arma.setProbabilidad(dobj.probabilidad);
+                arma.setBonusDefensa(dobj.bonusDefensa);
+                return arma;
+            case "pocion":
+                return new Pocion(dobj.id, dobj.nombre, dobj.bonusVida);
+            case "llave":
+                return new Llave(dobj.id, dobj.nombre);
+            default:
+                return null;
+        }
+    }
+
+    // Getter para todas las habitaciones (lo necesita GameUIController tras load)
+    public ListaSimplementeEnlazada<HabitacionModelo> getListaHabitaciones() {
+        return listaHabitaciones;
     }
 
     @Override

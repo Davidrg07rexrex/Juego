@@ -191,9 +191,12 @@ public class GameUIController {
 
         // Refrescar inventario
         view.getInventarioList().getItems().clear();
+
+        System.out.println("Tamaño inventario: " + juego.getInventory().getTamaño());
+
         for (int i = 0; i < juego.getInventory().getTamaño(); i++) {
             view.getInventarioList().getItems().add(
-                    juego.getInventory().getDatoEn(i).getNombre()
+                    juego.getInventory().getDatoEn(i).toString()
             );
         }
     }

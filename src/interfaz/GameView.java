@@ -50,6 +50,7 @@ public class GameView {
     private void crearInterfaz() {
 
         root = new BorderPane();
+        root.setPrefSize(1200, 800);
 
         Label titulo = new Label("Juego de Mazmorras - MVC");
         titulo.setStyle("-fx-font-size: 22px; -fx-font-weight: bold;");
@@ -61,7 +62,7 @@ public class GameView {
 
         gridHabitacion.setVgap(5);
 
-        panelDerecho = new VBox(15);
+        panelDerecho = new VBox(8);
         panelDerecho.setPrefWidth(250);
 
         vidaLabel = new Label("Vida: ");
@@ -74,8 +75,9 @@ public class GameView {
 
         inventarioList = new ListView<>();
 
-        inventarioList.setPrefHeight(120);
-        inventarioList.setMaxHeight(120);
+        inventarioList.setPrefHeight(160);
+        inventarioList.setMinHeight(160);
+        inventarioList.setMaxHeight(160);
 
         moverButton = new Button("Mover");
 
@@ -144,9 +146,14 @@ public class GameView {
 
         registroEventos = new TextArea();
 
+        registroEventos.setStyle("-fx-font-size: 16px;");
+
         registroEventos.setEditable(false);
 
-        registroEventos.setPrefHeight(150);
+        registroEventos.setPrefHeight(180);
+        registroEventos.setMinHeight(180);
+        registroEventos.setMaxHeight(180);
+        registroEventos.setScrollTop(Double.MAX_VALUE);
 
         root.setCenter(gridHabitacion);
 
@@ -181,6 +188,7 @@ public class GameView {
 
     public void escribirEvento(String texto) {
         registroEventos.appendText(texto + "\n");
+        registroEventos.setScrollTop(Double.MAX_VALUE);
     }
 
     public ListView<String> getInventarioList() {

@@ -149,4 +149,9 @@ public class HabitacionMock implements HabitacionModelo {
     private boolean dentro(int f, int c) {
         return f >= 0 && f < filas && c >= 0 && c < columnas;
     }
+    public void eliminarTrampa(int fila, int columna) {
+        if (fila >= 0 && fila < filas && columna >= 0 && columna < columnas) {
+            matrizTrampas[fila][columna] = null;
+        }
+    }
 }

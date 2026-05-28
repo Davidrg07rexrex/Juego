@@ -115,6 +115,7 @@ public class JuegoReal implements GameControllerModel {
             int danio = habitacionActual.getDanioTrampa(nueva.getFila(), nueva.getColumna());
             jugador.recibirDanio(danio);
             log.add("¡Has caído en una trampa! Recibes " + danio + " de daño.");
+            habitacionActual.eliminarTrampa(nueva.getFila(), nueva.getColumna());  // <-- NUEVO
             if (!jugador.estaVivo()) {
                 gameOver = true;
                 log.add("Has muerto por una trampa.");

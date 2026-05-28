@@ -92,7 +92,7 @@ public class InicializadorJuego {
         HabitacionModelo habInicial = buscarHabitacionPorId(listaHabitaciones, datos.partida.habitacionActual);
 
         // 9. JuegoReal
-        JuegoReal juego = new JuegoReal(jugador, habInicial, grafo, listaHabitaciones, 30);
+        JuegoReal juego = new JuegoReal(jugador, habInicial, grafo, listaHabitaciones, datos.partida.turnosMaximos);
 
         // 10. TurnoManager solo con enemigos de la habitación inicial
         if (habInicial instanceof Habitacion) {

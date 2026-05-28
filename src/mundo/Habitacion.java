@@ -162,7 +162,7 @@ public class Habitacion implements HabitacionModelo {
         Celda celda = getCelda(fila, columna);
         if (celda != null) {
             celda.setTipo("trampa");
-            celda.setAccesible(false);
+            //celda.setAccesible(false);
             celda.setContenido(trampa);
         }
     }
@@ -174,7 +174,7 @@ public class Habitacion implements HabitacionModelo {
         if (celda == null) return false;
         if (!celda.isAccesible()) return false;
         String tipo = celda.getTipo();
-        return !tipo.equals("enemigo") && !tipo.equals("trampa");
+        return !tipo.equals("enemigo");
     }
 
     //Metodo que devuelve el simbolo de una celda
@@ -331,5 +331,8 @@ public class Habitacion implements HabitacionModelo {
             }
         }
         return lista;
+    }
+    public void eliminarTrampa(int fila, int columna) {
+        limpiarCelda(fila, columna);
     }
 }

@@ -1,7 +1,6 @@
 package mundo;
 
-import java.util.Map;
-import io.DatosPartida.DatosCelda;
+import io.DatosPartida.DatosCelda;//..
 import listas.ListaSimplementeEnlazada;
 import modelo.Entidad;
 import modelo.HabitacionModelo;
@@ -271,51 +270,31 @@ public class Habitacion implements HabitacionModelo {
                 int columna = dato.columna;
 
                 if (tipo.equals("objeto")) {
-                    if (dato.contenido instanceof Map) {
-                        Map<String, Object> mapObj = (Map<String, Object>) dato.contenido;
-                        String idObj = (String) mapObj.get("id");
-                        if (idObj != null) {
-                            Objeto obj = buscarObjetoPorId(listaObjetos, idObj);
-                            if (obj != null) colocarObjeto(fila, columna, obj);
-                        }
+                    if (dato.idRef != null) {
+                        Objeto obj = buscarObjetoPorId(listaObjetos, dato.idRef);
+                        if (obj != null) colocarObjeto(fila, columna, obj);
                     }
                 } else if (tipo.equals("enemigo")) {
-                    if (dato.contenido instanceof Map) {
-                        Map<String, Object> mapEnem = (Map<String, Object>) dato.contenido;
-                        String idEnem = (String) mapEnem.get("id");
-                        if (idEnem != null) {
-                            Enemigo enemigo = buscarEnemigoPorId(listaEnemigos, idEnem); // <-- aquí se usa listaEnemigos
-                            if (enemigo != null) colocarEnemigo(fila, columna, enemigo);
-                        }
+                    if (dato.idRef != null) {
+                        Enemigo enemigo = buscarEnemigoPorId(listaEnemigos, dato.idRef);
+                        if (enemigo != null) colocarEnemigo(fila, columna, enemigo);
                     }
                 } else if (tipo.equals("puerta")) {
-                    if (dato.contenido instanceof Map) {
-                        Map<String, Object> datosPuerta = (Map<String, Object>) dato.contenido;
-                        String destino = (String) datosPuerta.get("destino");
+                    if (dato.destino != null) {
                         Celda celda = getCelda(fila, columna);
-                        if (destino != null && celda != null) {
-                            Boolean necesitaLlave = (Boolean) datosPuerta.get("necesitaLlave");
-                            if (necesitaLlave != null && necesitaLlave) {
-                                String idLlave = (String) datosPuerta.get("idLlave");
-                                Puerta puerta = new Puerta(destino, idLlave, celda);
+                        if (celda != null) {
+                            if (dato.necesitaLlave != null && dato.necesitaLlave) {
+                                Puerta puerta = new Puerta(dato.destino, dato.idLlave, celda);
                                 colocarPuerta(fila, columna, puerta);
                             } else {
-                                Puerta puerta = new Puerta(destino, celda);
+                                Puerta puerta = new Puerta(dato.destino, celda);
                                 colocarPuerta(fila, columna, puerta);
                             }
                         }
                     }
                 } else if (tipo.equals("trampa")) {
-                    if (dato.contenido instanceof Map) {
-                        Map<String, Object> mapTrampa = (Map<String, Object>) dato.contenido;
-                        Object valDanio = mapTrampa.get("danio");
-                        int danio = 0;
-                        if (valDanio instanceof Number) {
-                            danio = ((Number) valDanio).intValue();
-                        }
-                        Trampa trampa = new Trampa(danio);
-                        colocarTrampa(fila, columna, trampa);
-                    }
+                    Trampa trampa = new Trampa(dato.danio);
+                    colocarTrampa(fila, columna, trampa);
                 }
             }
         }

@@ -10,7 +10,6 @@ import io.Log;
 import io.EnemigoPlantilla;
 import mundo.*;
 import listas.*;
-import com.google.gson.internal.LinkedTreeMap;
 
 // Carga el mundo del juego desde un archivo JSON
 public class CargadorMundos {
@@ -93,13 +92,10 @@ public class CargadorMundos {
                     String tipo = celdaDatos.tipo;
 
                     if (tipo.equals("objeto")) {
-                        if (celdaDatos.contenido instanceof LinkedTreeMap) {
-                            LinkedTreeMap mapa = (LinkedTreeMap) celdaDatos.contenido;
-                            String idObj = (String) mapa.get("id");
-
+                        if (celdaDatos.idRef != null) {
                             for (int i = 0; i < objetosDisponibles.getTamaño(); i++) {
                                 Objeto plantilla = objetosDisponibles.getDatoEn(i);
-                                if (plantilla.getId().equals(idObj)) {
+                                if (plantilla.getId().equals(celdaDatos.idRef)) {
                                     Objeto nuevo = null;
                                     if (plantilla instanceof Arma) {
                                         Arma a = (Arma) plantilla;
@@ -123,13 +119,10 @@ public class CargadorMundos {
                         }
 
                     } else if (tipo.equals("enemigo")) {
-                        if (celdaDatos.contenido instanceof LinkedTreeMap) {
-                            LinkedTreeMap mapa = (LinkedTreeMap) celdaDatos.contenido;
-                            String idEnem = (String) mapa.get("id");
-
+                        if (celdaDatos.idRef != null) {
                             for (int i = 0; i < plantillas.getTamaño(); i++) {
                                 EnemigoPlantilla p = plantillas.getDatoEn(i);
-                                if (p.getId().equals(idEnem)) {
+                                if (p.getId().equals(celdaDatos.idRef)) {
                                     Enemigo enemigo = p.crearEnemigo();
                                     hab.colocarEnemigo(celdaDatos.fila, celdaDatos.columna, enemigo);
                                     break;
@@ -138,36 +131,21 @@ public class CargadorMundos {
                         }
 
                     } else if (tipo.equals("puerta")) {
-                        if (celdaDatos.contenido instanceof LinkedTreeMap) {
-                            LinkedTreeMap mapa = (LinkedTreeMap) celdaDatos.contenido;
-                            String destino = (String) mapa.get("destino");
-                            Boolean necesitaLlave = (Boolean) mapa.get("necesitaLlave");
-
+                        if (celdaDatos.destino != null) {
                             Celda celdaPuerta = hab.getCelda(celdaDatos.fila, celdaDatos.columna);
-                            if (destino != null && celdaPuerta != null) {
-                                if (necesitaLlave != null && necesitaLlave) {
-                                    String idLlave = (String) mapa.get("idLlave");
-                                    Puerta puerta = new Puerta(destino, idLlave, celdaPuerta);
+                            if (celdaPuerta != null) {
+                                if (celdaDatos.necesitaLlave != null && celdaDatos.necesitaLlave) {
+                                    Puerta puerta = new Puerta(celdaDatos.destino, celdaDatos.idLlave, celdaPuerta);
                                     hab.colocarPuerta(celdaDatos.fila, celdaDatos.columna, puerta);
                                 } else {
-                                    Puerta puerta = new Puerta(destino, celdaPuerta);
+                                    Puerta puerta = new Puerta(celdaDatos.destino, celdaPuerta);
                                     hab.colocarPuerta(celdaDatos.fila, celdaDatos.columna, puerta);
                                 }
                             }
                         }
 
                     } else if (tipo.equals("trampa")) {
-                        int danio = 0;
-                        if (celdaDatos.contenido instanceof LinkedTreeMap) {
-                            LinkedTreeMap mapa = (LinkedTreeMap) celdaDatos.contenido;
-                            Object d = mapa.get("danio");
-                            if (d instanceof Double) {
-                                danio = ((Double) d).intValue();
-                            } else if (d instanceof Long) {
-                                danio = ((Long) d).intValue();
-                            }
-                        }
-                        Trampa trampa = new Trampa(danio);
+                        Trampa trampa = new Trampa(celdaDatos.danio);
                         hab.colocarTrampa(celdaDatos.fila, celdaDatos.columna, trampa);
                     }
                 }

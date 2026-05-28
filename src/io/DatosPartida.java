@@ -82,7 +82,11 @@ public class DatosPartida {
         public int fila;
         public int columna;
         public boolean accesible;
-        public Object contenido;
+        public String idRef;
+        public String destino;
+        public Boolean necesitaLlave;
+        public String idLlave;
+        public int danio;
 
         // Necesario para Gson
         public DatosCelda() {}

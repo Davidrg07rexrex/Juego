@@ -18,4 +18,5 @@ public interface HabitacionModelo extends Comparable<HabitacionModelo> {
     String getIdLlavePuerta(int fila, int columna);
     boolean esTrampa(int fila, int columna);
     int getDanioTrampa(int fila, int columna);
+    void eliminarTrampa(int fila, int columna);
 }

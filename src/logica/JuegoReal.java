@@ -30,7 +30,7 @@ public class JuegoReal implements GameControllerModel {
     private ListaSimplementeEnlazada<HabitacionModelo> listaHabitaciones;
 
     // Seguimiento de objetos recogidos del suelo (para guardado)
-    private java.util.ArrayList<String> objetosRecogidos = new java.util.ArrayList<>();
+    private ListaSimplementeEnlazada<String> objetosRecogidos = new ListaSimplementeEnlazada<>();
 
     public JuegoReal(Jugador jugador, HabitacionModelo inicial,
                      Grafo<HabitacionModelo> grafo,
@@ -285,7 +285,10 @@ public class JuegoReal implements GameControllerModel {
 
             dg.equipamiento = new DatosEquipamiento();
 
-            dg.celdasVacias = objetosRecogidos.toArray(new String[0]);
+            dg.celdasVacias = new String[objetosRecogidos.getTamaño()];
+            for (int i = 0; i < objetosRecogidos.getTamaño(); i++) {
+                dg.celdasVacias[i] = objetosRecogidos.getDatoEn(i);
+            }
 
             int totalEnemigos = 0;
             for (int h = 0; h < listaHabitaciones.getTamaño(); h++) {
@@ -396,7 +399,7 @@ public class JuegoReal implements GameControllerModel {
                         }
                     }
                 }
-                objetosRecogidos.clear();
+                objetosRecogidos = new ListaSimplementeEnlazada<>();
                 for (String s : dg.celdasVacias) {
                     objetosRecogidos.add(s);
                 }

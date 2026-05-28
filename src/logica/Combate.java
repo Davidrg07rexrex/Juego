@@ -1,11 +1,8 @@
 package logica;
 
 import modelo.Entidad;
-import java.util.Random;
 
 public class Combate {
-
-    private static final Random dado = new Random();
 
     /**
      * Resuelve un ataque de 'atacante' contra 'defensor'.
